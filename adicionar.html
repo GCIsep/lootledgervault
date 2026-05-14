@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Jogo - Loja de Jogos</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <header>
+        <h1>Gestão de Inventário</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="inventario.html">Inventário</a>
+            <a href="adicionar.html">Adicionar Jogo</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="inventory-container">
+            <h2>Registar Novo Jogo Físico</h2>
+            
+            <form action="#" method="POST" class="form-adicionar">
+                <div class="form-group">
+                    <label for="titulo">Título do Jogo:</label>
+                    <input type="text" id="titulo" name="titulo" placeholder="Ex: God of War Ragnarök" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="plataforma">Plataforma:</label>
+                    <select id="plataforma" name="plataforma" required>
+                        <option value="">Selecione uma consola...</option>
+                        <option value="PS5">PlayStation 5</option>
+                        <option value="PS4">PlayStation 4</option>
+                        <option value="Switch">Nintendo Switch</option>
+                        <option value="Xbox">Xbox Series X/S</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="stock">Quantidade em Stock:</label>
+                    <input type="number" id="stock" name="stock" min="0" value="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="preco">Preço Final (€):</label>
+                    <input type="number" id="preco" name="preco" step="0.01" min="0" placeholder="69.99" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Guardar no Inventário</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
