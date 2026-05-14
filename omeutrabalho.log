@@ -1,0 +1,97 @@
+commit 0c57eff79576a644160ff8b7cc2c7bfd3fd19cf0
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:23:48 2026 +0100
+
+    Create .gitignore
+
+commit a2030f40d6be55b81b9b45d7d6f26b2768f19417
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:21:08 2026 +0100
+
+    Create adicionar.html
+
+commit 9626953c3e8b549cbac8aeb32acd92d830423a4a
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:17:47 2026 +0100
+
+    parte do guiao 2
+
+commit f3960c4f388ec8ff3579c2d3f1c474e9d3f0e63b
+Merge: 9cb4f43 1aedffd
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:12:37 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit 9cb4f43ca1faee15f4bc04cbc710f53fb8bdcdb7
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:12:33 2026 +0100
+
+    Create inventario.html
+
+commit 1aedffde9ca766b684e9d2591cdc5170f99f6bee
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:12:09 2026 +0100
+
+    Update index.html
+
+commit d67760a56443df718bc27e3531d2485c74fc90b3
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:11:30 2026 +0100
+
+    parte do guiao
+
+commit ef71dcda4e72c87e72edca4f1cbc586c4e335c57
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:08:11 2026 +0100
+
+    teste do vscode
+
+commit a9676930b22da9f1063d20c4037ab7ff48200c80
+Merge: b26aa16 0c53bc9
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:03:41 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit b26aa16e78911d8e8656a891761e4345c492c52a
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:03:17 2026 +0100
+
+    t
+
+commit 0c53bc98fffb3e116e4434dc430f6e759097b5f7
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:03:13 2026 +0100
+
+    Update comments for clarity in index.html
+
+commit 40003ad6023500c0410a5fd34d3bdaa3cf147fcf
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:00:31 2026 +0100
+
+    Rename O_Menu_Antes_do_inicial to index.html
+
+commit b4db0d1934c205ff59aa1003456df334c64fa9b1
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 09:59:29 2026 +0100
+
+    Add initial menu HTML for Loot Ledger Vault
+
+commit 65233c7c1cb89e8bddde140fa20b2fbfee0ef4f6
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 09:57:42 2026 +0100
+
+    Adicionei um ficheiro test.css
+
+commit e40f813f3837f6ea7c1577a59f07d913bbef7e05
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 09:51:16 2026 +0100
+
+    Update README.md
+
+commit c13a46dd151b8498463f9e94493bdfb5321a9e44
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 09:35:07 2026 +0100
+
+    Initial commit
