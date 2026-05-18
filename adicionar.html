@@ -3,53 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar Jogo - Loja de Jogos</title>
+    <title>Adicionar Item - Loja de Jogos</title>
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
     <header>
-        <h1>Gestão de Inventário</h1>
+        <h1>Adicionar Item</h1>
         <nav>
             <a href="index.html">Início</a>
-            <a href="inventario.html">Inventário</a>
-            <a href="adicionar.html">Adicionar Jogo</a>
+            <a href="inventory.html" class="button">Inventário</a>
         </nav>
     </header>
 
     <main>
-        <section class="inventory-container">
-            <h2>Registar Novo Jogo Físico</h2>
-            
-            <form action="#" method="POST" class="form-adicionar">
-                <div class="form-group">
-                    <label for="titulo">Título do Jogo:</label>
-                    <input type="text" id="titulo" name="titulo" placeholder="Ex: God of War Ragnarök" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="plataforma">Plataforma:</label>
-                    <select id="plataforma" name="plataforma" required>
-                        <option value="">Selecione uma consola...</option>
-                        <option value="PS5">PlayStation 5</option>
-                        <option value="PS4">PlayStation 4</option>
-                        <option value="Switch">Nintendo Switch</option>
-                        <option value="Xbox">Xbox Series X/S</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="stock">Quantidade em Stock:</label>
-                    <input type="number" id="stock" name="stock" min="0" value="1" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="preco">Preço Final (€):</label>
-                    <input type="number" id="preco" name="preco" step="0.01" min="0" placeholder="69.99" required>
-                </div>
-
-                <button type="submit" class="btn-submit">Guardar no Inventário</button>
+        <section class="add-item">
+            <h2>Novo jogo</h2>
+            <form id="add-form">
+                <label>Título
+                    <input type="text" id="title" required>
+                </label>
+                <label>Plataforma
+                    <input type="text" id="platform" required>
+                </label>
+                <label>Stock
+                    <input type="number" id="stock" min="0" required>
+                </label>
+                <label>Preço
+                    <input type="number" id="price" step="0.01" min="0" required>
+                </label>
+                <button type="submit">Salvar</button>
             </form>
         </section>
+
+        <section class="database-container">
+            <h2>Inventário Atual</h2>
+            <table id="database-table">
+                <thead>
+                    <tr>
+                        <th>Capa</th>
+                        <th>Título</th>
+                        <th>Plataforma</th>
+                        <th>Stock</th>
+                        <th>Preço</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
     </main>
+
+    <script src="database.js"></script>
+    <script>
+        function renderDatabase() {
+            const tbody = document.querySelector('#database-table tbody');
+            tbody.innerHTML = '';
+            database.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${item.img}" alt="${item.title}" width="50"></td>
+                    <td>${item.title}</td>
+                    <td>${item.platform}</td>
+                    <td>${item.stock}</td>
+                    <td>${item.price.toFixed(2)}€</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDatabase);
+
+        document.getElementById('add-form').addEventListener('submit', event => {
+            event.preventDefault();
+            database.push({
+                img: 'images/placeholder.jpg',
+                title: document.getElementById('title').value,
+                platform: document.getElementById('platform').value,
+                stock: Number(document.getElementById('stock').value),
+                price: Number(document.getElementById('price').value)
+            });
+            saveDatabase();
+            renderDatabase();
+            event.target.reset();
+        });
+    </script>
 </body>
 </html>

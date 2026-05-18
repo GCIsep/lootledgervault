@@ -11,6 +11,7 @@
         <h1>Gestão de Inventário</h1>
         <nav>
             <a href="index.html">Início</a>
+            <a href="adicionar.html" class="button">Adicionar</a>
         </nav>
     </header>
 
@@ -26,24 +27,30 @@
                         <th>Preço</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="item-disponivel">
-                        <td><img src="images/jogo1.jpg" alt="Jogo" width="50"></td>
-                        <td>Elden Ring</td>
-                        <td>PS5</td>
-                        <td>12</td>
-                        <td>59.99€</td>
-                    </tr>
-                    <tr class="item-esgotado">
-                        <td><img src="images/jogo2.jpg" alt="Jogo" width="50"></td>
-                        <td>Retro World</td>
-                        <td>Switch</td>
-                        <td>0</td>
-                        <td>25.00€</td>
-                    </tr>
-                </tbody>
+                <tbody id="inventory-body"></tbody>
             </table>
         </section>
     </main>
+
+    <script src="database.js"></script>
+    <script>
+        function renderInventory() {
+            const tbody = document.getElementById('inventory-body');
+            tbody.innerHTML = '';
+            database.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${item.img}" alt="${item.title}" width="50"></td>
+                    <td>${item.title}</td>
+                    <td>${item.platform}</td>
+                    <td>${item.stock}</td>
+                    <td>${item.price.toFixed(2)}€</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderInventory);
+    </script>
 </body>
 </html>
