@@ -1,0 +1,220 @@
+commit 54d70694a3bb1a40d5c7324751eab1c5a6f9b274
+Merge: b48863e 5e31e6d
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 10:28:27 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit b48863e658b895f0a27e547e6aa234e25f56c66b
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 10:27:58 2026 +0100
+
+    Update inventory.html
+
+commit 5e31e6df41d21aa2f62bc5811b64f128e3dc1b7a
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 21 10:27:58 2026 +0100
+
+    voltei a melhorar um pouco a database
+
+commit 2a6e07960a02c3ff555530e4f75d940487f998ab
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 10:25:16 2026 +0100
+
+    Update calendario.html
+
+commit 33563c0b83c60f7a441d5175008052824986148c
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 10:23:28 2026 +0100
+
+    Update calendario.html
+
+commit bb8125ad23fb6cdc9448a9e7dfbd0db87be74bcd
+Merge: 92988f9 471561d
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 10:23:01 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit 92988f996b720fddc331a32a066ec9f72313f402
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 10:20:18 2026 +0100
+
+    Update calendario.html
+
+commit 471561d4e6044509cb570e4ca1e7a2a0057b0691
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 10:18:25 2026 +0100
+
+    adicionei o botao remover
+
+commit 805794f72be9e9b6f90716c129fc0acbae094618
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 21 10:15:00 2026 +0100
+
+    added a database base
+
+commit 8288d6fae3151a2850152ae8b129d43a00cdf2dd
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 21 10:06:15 2026 +0100
+
+    changed the output to go to the login page instead of the inventory.
+
+commit d6f971b17d46255f5e9061b08c340999a685921e
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 21 09:53:38 2026 +0100
+
+    Add initial login page with styling and functionality
+
+commit d2e7bf79fcf0277ee76cf8e6e25803db691e46cf
+Merge: 13d3c55 eefa459
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 09:48:10 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit 13d3c55170df640ba2a15043d0609744d026bf5c
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 09:48:06 2026 +0100
+
+    Create calendario.html
+
+commit eefa45916191b07b63e740253f6d345a2719a622
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 09:47:09 2026 +0100
+
+    parte do guiao
+
+commit a418bf1b85cae716c1d4b2c5361267361124611f
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 08:49:43 2026 +0100
+
+    Update adicionar.html
+
+commit 7c078202c175c0da5c7932c209834d8ac909dc9c
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 18 14:55:14 2026 +0100
+
+    adicionei a abilidade de adicionar jogos ao stock, uma database e leitura da database
+
+commit c5da07b13d1eb069330903d753a354b18624bedf
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 18 14:19:44 2026 +0100
+
+    hg
+
+commit 03668b5a25f13f7013395c87776665e93be05b97
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:34:15 2026 +0100
+
+    Update index.html
+
+commit 4c5978e031ce4516411a9b37259654bd291c6a66
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:31:59 2026 +0100
+
+    Create fundo_do_Index_estrelas.png
+
+commit 6b1c27f2745a9c31bb9c52919f53e23fc175cf21
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:27:11 2026 +0100
+
+    Create omeutrabalho.log
+
+commit 0c57eff79576a644160ff8b7cc2c7bfd3fd19cf0
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:23:48 2026 +0100
+
+    Create .gitignore
+
+commit a2030f40d6be55b81b9b45d7d6f26b2768f19417
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:21:08 2026 +0100
+
+    Create adicionar.html
+
+commit 9626953c3e8b549cbac8aeb32acd92d830423a4a
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:17:47 2026 +0100
+
+    parte do guiao 2
+
+commit f3960c4f388ec8ff3579c2d3f1c474e9d3f0e63b
+Merge: 9cb4f43 1aedffd
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:12:37 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit 9cb4f43ca1faee15f4bc04cbc710f53fb8bdcdb7
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:12:33 2026 +0100
+
+    Create inventario.html
+
+commit 1aedffde9ca766b684e9d2591cdc5170f99f6bee
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:12:09 2026 +0100
+
+    Update index.html
+
+commit d67760a56443df718bc27e3531d2485c74fc90b3
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:11:30 2026 +0100
+
+    parte do guiao
+
+commit ef71dcda4e72c87e72edca4f1cbc586c4e335c57
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:08:11 2026 +0100
+
+    teste do vscode
+
+commit a9676930b22da9f1063d20c4037ab7ff48200c80
+Merge: b26aa16 0c53bc9
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:03:41 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit b26aa16e78911d8e8656a891761e4345c492c52a
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:03:17 2026 +0100
+
+    t
+
+commit 0c53bc98fffb3e116e4434dc430f6e759097b5f7
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:03:13 2026 +0100
+
+    Update comments for clarity in index.html
+
+commit 40003ad6023500c0410a5fd34d3bdaa3cf147fcf
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:00:31 2026 +0100
+
+    Rename O_Menu_Antes_do_inicial to index.html
+
+commit b4db0d1934c205ff59aa1003456df334c64fa9b1
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 09:59:29 2026 +0100
+
+    Add initial menu HTML for Loot Ledger Vault
+
+commit 65233c7c1cb89e8bddde140fa20b2fbfee0ef4f6
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 09:57:42 2026 +0100
+
+    Adicionei um ficheiro test.css
+
+commit e40f813f3837f6ea7c1577a59f07d913bbef7e05
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 09:51:16 2026 +0100
+
+    Update README.md
+
+commit c13a46dd151b8498463f9e94493bdfb5321a9e44
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 09:35:07 2026 +0100
+
+    Initial commit
