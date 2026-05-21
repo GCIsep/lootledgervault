@@ -11,12 +11,35 @@
         <h1>Gestão de Inventário</h1>
         <nav>
             <a href="index.html">Início</a>
-            <a href="adicionar.html" class="button">Adicionar</a>
+            <a href="#add-item" class="button">Adicionar</a>
         </nav>
     </header>
 
     <main>
+        <section id="add-item" class="add-item hidden">
+            <h2>Novo jogo</h2>
+            <form id="add-form">
+                <label>Título
+                    <input type="text" id="title" required>
+                </label>
+                <label>Plataforma
+                    <input type="text" id="platform" required>
+                </label>
+                <label>Stock
+                    <input type="number" id="stock" min="0" required>
+                </label>
+                <label>Preço
+                    <input type="number" id="price" step="0.01" min="0" required>
+                </label>
+                <label>Imagem
+                    <input type="file" id="image" accept="image/*" required>
+                </label>
+                <button type="submit">Salvar</button>
+            </form>
+        </section>
+
         <section class="inventory-container">
+            <h2>Inventário Atual</h2>
             <table>
                 <thead>
                     <tr>
@@ -50,7 +73,52 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', renderInventory);
+        document.addEventListener('DOMContentLoaded', () => {
+            const addButton = document.querySelector('a[href="#add-item"]');
+            const addSection = document.getElementById('add-item');
+
+            function toggleAddSection() {
+                const isHidden = addSection.classList.toggle('hidden');
+                addButton.blur();
+                if (!isHidden) {
+                    addSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            addButton.addEventListener('click', event => {
+                event.preventDefault();
+                toggleAddSection();
+            });
+
+            if (window.location.hash === '#add-item') {
+                addSection.classList.remove('hidden');
+                addSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            renderInventory();
+
+            document.getElementById('add-form').addEventListener('submit', event => {
+                event.preventDefault();
+
+                const imageFile = document.getElementById('image').files[0];
+                if (!imageFile) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    database.push({
+                        img: e.target.result,
+                        title: document.getElementById('title').value,
+                        platform: document.getElementById('platform').value,
+                        stock: Number(document.getElementById('stock').value),
+                        price: Number(document.getElementById('price').value)
+                    });
+                    saveDatabase();
+                    renderInventory();
+                    event.target.reset();
+                };
+                reader.readAsDataURL(imageFile);
+            });
+        });
     </script>
 </body>
 </html>
