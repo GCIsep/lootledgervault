@@ -31,6 +31,9 @@
                 <label>Preço
                     <input type="number" id="price" step="0.01" min="0" required>
                 </label>
+                <label>Imagem
+                    <input type="file" id="image" accept="image/*" required>
+                </label>
                 <button type="submit">Salvar</button>
             </form>
         </section>
@@ -74,16 +77,22 @@
 
         document.getElementById('add-form').addEventListener('submit', event => {
             event.preventDefault();
-            database.push({
-                img: 'images/placeholder.jpg',
-                title: document.getElementById('title').value,
-                platform: document.getElementById('platform').value,
-                stock: Number(document.getElementById('stock').value),
-                price: Number(document.getElementById('price').value)
-            });
-            saveDatabase();
-            renderDatabase();
-            event.target.reset();
+            const imageFile = document.getElementById('image').files[0];
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                database.push({
+                    img: e.target.result,
+                    title: document.getElementById('title').value,
+                    platform: document.getElementById('platform').value,
+                    stock: Number(document.getElementById('stock').value),
+                    price: Number(document.getElementById('price').value)
+                });
+                saveDatabase();
+                renderDatabase();
+                event.target.reset();
+            };
+            reader.readAsDataURL(imageFile);
         });
     </script>
 </body>
