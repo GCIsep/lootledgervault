@@ -10,6 +10,10 @@ body {
     line-height: 1.6;
 }
 
+.hidden {
+    display: none;
+}
+
 h1, h2, h3 {
     color: #ffaa00; /* Laranja de destaque */
 }
