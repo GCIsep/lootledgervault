@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loot Ledger Vault • Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        
+        :root {
+            --arcane-gold: #F5D21D;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000 url('images/fundo_do_Index_estrelas.png') center/cover no-repeat fixed;
+            color: var(--arcane-gold);
+            font-family: 'VT323', monospace;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        #canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.35;
+            mix-blend-mode: screen;
+        }
+        
+        .login-container {
+            z-index: 2;
+            width: 420px;
+            text-align: center;
+            border: 3px solid var(--arcane-gold);
+            padding: 50px 40px;
+            background: rgba(10, 10, 10, 0.92);
+            box-shadow: 0 0 50px var(--arcane-gold);
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            margin: 0 0 30px 0;
+            text-shadow: 0 0 25px var(--arcane-gold);
+            letter-spacing: 6px;
+        }
+        
+        .subtitle {
+            font-size: 1.6rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: var(--arcane-gold);
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--arcane-gold);
+            color: var(--arcane-gold);
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(245, 210, 29, 0.3);
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 25px var(--arcane-gold);
+            border-color: #fff;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 2rem;
+            background: transparent;
+            color: var(--arcane-gold);
+            border: 3px solid var(--arcane-gold);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            margin-top: 20px;
+        }
+        
+        .login-btn:hover {
+            background: var(--arcane-gold);
+            color: #000;
+            box-shadow: 0 0 50px var(--arcane-gold);
+        }
+        
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(245, 210, 29, 0.08) 50%
+            );
+            background-size: 100% 6px;
+            pointer-events: none;
+            animation: scan 4s linear infinite;
+            z-index: 3;
+        }
+        
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+        
+        .note {
+            font-size: 1rem;
+            margin-top: 30px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="login-container">
+        <h1>LOOT LEDGER VAULT</h1>
+        <p class="subtitle">ACCESS TERMINAL </p>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label>USERNAME</label>
+                <input type="text" id="username" placeholder="contractor_42" required>
+            </div>
+            
+            <div class="input-group">
+                <label>PASSWORD</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="login-btn">ENTER THE VAULT</button>
+        </form>
+        
+        <p class="note">
+            Informação do utilizador é temporária.<br>
+            Máximo anonimato ativado.
+        </p>
+        
+        <p style="font-size:0.9rem; margin-top:40px; opacity:0.5;">
+            Grupo 4 • Ana Luísa • João Afonso • André Assunção
+        </p>
+    </div>
+    
+    <div class="scanline"></div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        const characters = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛋᛏᛒᛖᛗᛚᛜᛝᛞᛟ☿♀♂♃♄♅♆♇🔮✧⚝☯♾️🜁🜂🜃🜄🜅01★';
+        const fontSize = 17;
+        let drops = [];
+        
+        function initRain() {
+            drops = [];
+            const columns = canvas.width / fontSize;
+            for (let x = 0; x < columns; x++) {
+                drops[x] = Math.floor(Math.random() * canvas.height / fontSize);
+            }
+        }
+        
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.035)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#F5D21D';
+            ctx.font = `${fontSize}px monospace`;
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters[Math.floor(Math.random() * characters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        function animate() {
+            draw();
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initRain();
+        });
+        
+        resizeCanvas();
+        initRain();
+        animate();
+        
+        // Login fake (para teste)
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value || 'CONTRACTOR';
+            
+            // Efeito de entrada no Vault
+            document.body.style.transition = 'opacity 1s';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                alert(`✅ ACCESS GRANTED\nBem-vindo, ${user}. Sessão anónima iniciada.`);
+                window.location.href = 'inventory.html';
+            }, 800);
+        });
+        
+        console.log('%cLoot Ledger Vault – Login Terminal loaded', 'color:#F5D21D; font-family:monospace');
+    </script>
+</body>
+</html>
