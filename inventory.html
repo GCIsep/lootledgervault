@@ -11,11 +11,21 @@
         <h1>Gestão de Inventário</h1>
         <nav>
             <a href="index.html">Início</a>
-            <a href="#add-item" class="button">Adicionar</a>
         </nav>
     </header>
 
     <main>
+        <div class="controls-panel">
+            <label>
+                <input type="checkbox" id="toggle-add" />
+                Adicionar
+            </label>
+            <label>
+                <input type="checkbox" id="toggle-remove" />
+                Remover
+            </label>
+        </div>
+
         <section id="add-item" class="add-item hidden">
             <h2>Novo jogo</h2>
             <form id="add-form">
@@ -74,23 +84,21 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const addButton = document.querySelector('a[href="#add-item"]');
+            const toggleAddCheckbox = document.getElementById('toggle-add');
+            const toggleRemoveCheckbox = document.getElementById('toggle-remove');
             const addSection = document.getElementById('add-item');
 
-            function toggleAddSection() {
-                const isHidden = addSection.classList.toggle('hidden');
-                addButton.blur();
-                if (!isHidden) {
+            toggleAddCheckbox.addEventListener('change', () => {
+                if (toggleAddCheckbox.checked) {
+                    addSection.classList.remove('hidden');
                     addSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    addSection.classList.add('hidden');
                 }
-            }
-
-            addButton.addEventListener('click', event => {
-                event.preventDefault();
-                toggleAddSection();
             });
 
             if (window.location.hash === '#add-item') {
+                toggleAddCheckbox.checked = true;
                 addSection.classList.remove('hidden');
                 addSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
