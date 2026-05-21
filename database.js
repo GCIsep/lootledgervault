@@ -35,7 +35,7 @@ function saveDatabase(data = database) {
     database = data; // mantém sincronizado
 }
 
-// === FUNÇÕES ÚTEIS PARA O PROJETO q tamos a fzr ===
+// === FUNÇÕES ÚTEIS PARA O PROJETO ===
 function addItem(newItem) {
     const item = {
         id: Date.now(),
@@ -67,7 +67,7 @@ function searchItems(query) {
     );
 }
 
-// Exporta tudo para poder usar em qualquer página heheheh :nixxie
+// Exporta tudo para poder usar em qualquer página
 window.db = {
     database,
     addItem,
