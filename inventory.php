@@ -29,6 +29,9 @@ $db->exec("CREATE TABLE IF NOT EXISTS games_inventory (
 // Processar formulários (Adicionar / Remover / Atualizar Stock)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     
+    $hoje = date('Y-m-d'); // Guarda a data de hoje
+    $user_id = $_SESSION['user_id']; // Sabe quem fez a ação
+    
     // AÇÃO: ADICIONAR JOGO NOVO
     if ($_POST['action'] === 'add') {
         $title = SQLite3::escapeString($_POST['title'] ?? '');
@@ -46,6 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         if (!empty($title)) {
             $db->exec("INSERT INTO games_inventory (title, platform, stock, price, img) 
                        VALUES ('$title', '$platform', $stock, $price, '$imgPath')");
+                       
+            // REGISTAR NO CALENDÁRIO
+            $desc = SQLite3::escapeString("🎮 Novo jogo: $title ($stock un.)");
+            $db->exec("INSERT INTO events (event_date, description, user_id) VALUES ('$hoje', '$desc', $user_id)");
         }
     }
     
@@ -56,21 +63,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         $operation = $_POST['operation'] ?? '';
 
         if ($item_id > 0 && $qty > 0) {
-            // Vai buscar o stock atual do jogo
-            $current_stock = $db->querySingle("SELECT stock FROM games_inventory WHERE id = $item_id");
+            $jogo = $db->querySingle("SELECT title, stock FROM games_inventory WHERE id = $item_id", true);
             
-            if ($current_stock !== false) {
+            if ($jogo) {
+                $current_stock = $jogo['stock'];
+                $nome_jogo = SQLite3::escapeString($jogo['title']);
+                $desc = '';
+
                 if ($operation === 'add') {
                     $new_stock = $current_stock + $qty;
+                    $desc = "📦 Entrada: $nome_jogo (+$qty)";
                 } elseif ($operation === 'sub') {
-                    // Garante que o stock não fica negativo (no mínimo 0)
                     $new_stock = max(0, $current_stock - $qty);
+                    $desc = "📤 Saída: $nome_jogo (-$qty)";
                 } else {
                     $new_stock = $current_stock;
                 }
                 
-                // Grava o novo stock na base de dados
                 $db->exec("UPDATE games_inventory SET stock = $new_stock WHERE id = $item_id");
+                
+                // REGISTAR NO CALENDÁRIO
+                if (!empty($desc)) {
+                    $db->exec("INSERT INTO events (event_date, description, user_id) VALUES ('$hoje', '$desc', $user_id)");
+                }
             }
         }
     }
@@ -79,7 +94,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     if ($_POST['action'] === 'remove') {
         $item_id = (int)($_POST['item_id'] ?? 0);
         if ($item_id > 0) {
-            $db->exec("DELETE FROM games_inventory WHERE id = $item_id");
+            $titulo = $db->querySingle("SELECT title FROM games_inventory WHERE id = $item_id");
+            if ($titulo) {
+                $db->exec("DELETE FROM games_inventory WHERE id = $item_id");
+                
+                // REGISTAR NO CALENDÁRIO
+                $desc = SQLite3::escapeString("🗑️ Removido: $titulo");
+                $db->exec("INSERT INTO events (event_date, description, user_id) VALUES ('$hoje', '$desc', $user_id)");
+            }
         }
     }
 
@@ -97,23 +119,18 @@ $result = $db->query("SELECT * FROM games_inventory");
     <title>Inventário - Loja de Jogos</title>
     <link rel="stylesheet" href="styles/style.css">
     <style>
-        /* Ajustes base para o formulário */
         button { background-color: #ffaa00; color: #1a1a1a; font-weight: bold; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s;}
         button:hover { background-color: #e69900; }
         input { padding: 5px; margin: 5px 0; border-radius: 3px; border: 1px solid #444; background: #333; color: white; }
         
         .sem-capa { width: 60px; height: 80px; background-color: #333; border: 1px dashed #555; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #888; text-align: center; }
         
-        /* =========================================
-           Lógica da Coluna de Ações (Esconder/Mostrar)
-           ========================================= */
         .col-remover { display: none !important; }
         .modo-remover .col-remover { display: table-cell !important; }
         @media screen and (max-width: 768px) {
             .modo-remover .col-remover { display: block !important; }
         }
 
-        /* Botões de Gestão de Stock */
         .acoes-container { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .qtd-input { width: 50px; text-align: center; padding: 6px; margin: 0; font-family: 'VT323', monospace; font-size: 1.1rem;}
         .btn-add { background-color: #00cc66; color: white; padding: 6px 10px; font-size: 1.2rem; }
@@ -208,7 +225,6 @@ $result = $db->query("SELECT * FROM games_inventory");
                             
                             <td class="col-remover" data-label="Ações">
                                 <div class="acoes-container">
-                                    
                                     <form method="POST" action="inventory.php" style="margin: 0; display: flex; gap: 4px; align-items: center;">
                                         <input type="hidden" name="action" value="update_stock">
                                         <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
@@ -222,7 +238,6 @@ $result = $db->query("SELECT * FROM games_inventory");
                                         <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
                                         <button type="submit" class="btn-del" onclick="return confirm('ATENÇÃO: Apagar o jogo <?php echo addslashes(htmlspecialchars($item['title'])); ?> da base de dados?');" title="Apagar Jogo">🗑️</button>
                                     </form>
-
                                 </div>
                             </td>
                         </tr>
@@ -238,7 +253,6 @@ $result = $db->query("SELECT * FROM games_inventory");
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Lógica do botão Adicionar (Esconder/Mostrar Formulário)
             const toggleAddCheckbox = document.getElementById('toggle-add');
             const addSection = document.getElementById('add-item');
 
@@ -251,7 +265,6 @@ $result = $db->query("SELECT * FROM games_inventory");
                 }
             });
 
-            // Lógica do botão Gerir/Remover (Esconder/Mostrar Coluna)
             const toggleRemoveCheckbox = document.getElementById('toggle-remove');
             const tabelaInventario = document.getElementById('tabela-jogos');
 

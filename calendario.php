@@ -17,13 +17,28 @@ require_once 'scripts/database.php';
 // 1. Procurar jogos com Stock 0 (Em Falta)
 $query_falta = $db->query("SELECT * FROM games_inventory WHERE stock = 0 ORDER BY title ASC LIMIT 5");
 
-// 2. Procurar jogos com Stock > 50 (Em Excesso - podes mudar o número se quiseres)
+// 2. Procurar jogos com Stock > 50 (Em Excesso)
 $limite_excesso = 50;
 $query_excesso = $db->query("SELECT * FROM games_inventory WHERE stock > $limite_excesso ORDER BY stock DESC LIMIT 5");
 
 // 3. Procurar os últimos 3 jogos adicionados (Stock Novo)
-// Como usamos id com AUTOINCREMENT, os IDs mais altos são os mais recentes
 $query_novo = $db->query("SELECT * FROM games_inventory ORDER BY id DESC LIMIT 3");
+
+// 4. LER TODOS OS EVENTOS PARA O CALENDÁRIO
+$query_eventos = $db->query("SELECT event_date, description FROM events");
+$eventos_calendario = [];
+
+while ($row = $query_eventos->fetchArray(SQLITE3_ASSOC)) {
+    $data = $row['event_date'];
+    if (!isset($eventos_calendario[$data])) {
+        $eventos_calendario[$data] = [];
+    }
+    // Adiciona o evento à data correspondente
+    $eventos_calendario[$data][] = $row['description'];
+}
+
+// Converte a lista de eventos para JSON para o JavaScript poder ler!
+$eventos_json = json_encode($eventos_calendario);
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -34,7 +49,6 @@ $query_novo = $db->query("SELECT * FROM games_inventory ORDER BY id DESC LIMIT 3
     <link rel="stylesheet" href="styles/style.css">
     
     <style>
-        /* ESTILOS ESPECÍFICOS DO CALENDÁRIO */
         .calendar-wrapper { display: flex; gap: 24px; max-width: 1200px; margin: 40px auto; padding: 0 20px; align-items: flex-start; flex-wrap: wrap; }
         .panel { flex: 1; background-color: #262626; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); padding: 25px; min-width: 320px; }
         .left-panel { flex: 1; }
@@ -47,13 +61,27 @@ $query_novo = $db->query("SELECT * FROM games_inventory ORDER BY id DESC LIMIT 3
         
         .calendar-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 10px; }
         .calendar-table th { background-color: #333; color: #ffaa00; padding: 12px; text-align: center; border: 1px solid #404040; }
-        .calendar-table td { border: 1px solid #404040; padding: 10px; text-align: center; height: 80px; vertical-align: top; background-color: #2e2e2e; color: #e0e0e0; transition: background 0.2s; }
+        .calendar-table td { border: 1px solid #404040; padding: 5px; text-align: left; height: 100px; vertical-align: top; background-color: #2e2e2e; color: #e0e0e0; transition: background 0.2s; position: relative; }
         .calendar-table td.other-month { background-color: #1a1a1a; color: #555; }
         .calendar-table td:hover:not(.other-month) { background-color: #3d3d3d; cursor: pointer; }
         .calendar-table td.today { background-color: rgba(255, 170, 0, 0.15); border: 2px solid #ffaa00; color: #fff; font-weight: bold; }
-        .day-number { margin-bottom: 5px; font-size: 1.1em; }
+        
+        .day-number { margin-bottom: 5px; font-size: 1.1em; text-align: right; width: 100%; display: block;}
 
-        /* Estilos das Notícias de Stock */
+        .event-badge {
+            background-color: rgba(255, 170, 0, 0.15);
+            color: #ffcc66;
+            font-size: 0.75rem;
+            padding: 3px 4px;
+            margin-top: 3px;
+            border-radius: 3px;
+            border-left: 2px solid #ffaa00;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: sans-serif;
+        }
+
         .news-section { margin-bottom: 25px; }
         .news-section h2 { font-size: 1.3rem; border-bottom: 2px solid #404040; padding-bottom: 8px; margin-bottom: 15px; }
         .news-item { background-color: #333; padding: 15px; margin-bottom: 12px; border-left: 4px solid #ffaa00; border-radius: 6px; transition: transform 0.2s ease, background-color 0.2s ease; }
@@ -181,6 +209,8 @@ $query_novo = $db->query("SELECT * FROM games_inventory ORDER BY id DESC LIMIT 3
     </main>
 
     <script>
+        const dbEvents = <?php echo $eventos_json; ?>;
+        
         let currentDate = new Date();
 
         function generateCalendar() {
@@ -192,19 +222,32 @@ $query_novo = $db->query("SELECT * FROM games_inventory ORDER BY id DESC LIMIT 3
             const cells = [];
 
             for (let i = firstDay - 1; i >= 0; i--) {
-                cells.push(`<td class="other-month">${daysInPrevMonth - i}</td>`);
+                cells.push(`<td class="other-month"><div class="day-number">${daysInPrevMonth - i}</div></td>`);
             }
 
             const today = new Date();
             for (let day = 1; day <= daysInMonth; day++) {
                 const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-                cells.push(`<td class="${isToday ? 'today' : ''}"><div class="day-number">${day}</div></td>`);
+                
+                const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                let eventHtml = '';
+                if (dbEvents[dateString]) {
+                    dbEvents[dateString].forEach(evt => {
+                        eventHtml += `<div class="event-badge" title="${evt}">${evt}</div>`;
+                    });
+                }
+
+                cells.push(`<td class="${isToday ? 'today' : ''}">
+                    <span class="day-number">${day}</span>
+                    ${eventHtml}
+                </td>`);
             }
 
             const totalCells = firstDay + daysInMonth;
             const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
             for (let day = 1; day <= remainingCells; day++) {
-                cells.push(`<td class="other-month">${day}</td>`);
+                cells.push(`<td class="other-month"><div class="day-number">${day}</div></td>`);
             }
 
             let html = '';
