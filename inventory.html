@@ -1,4 +1,41 @@
 <!DOCTYPE html>
+<?php
+$mysqli = new mysqli('localhost', 'root', '', 'lootledhervault');
+if ($mysqli->connect_error) {
+    die('Erro de conexão: (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action']) && $_POST['action'] === 'remove' && isset($_POST['item_id'])) {
+        $stmt = $mysqli->prepare('DELETE FROM inventory WHERE id = ?');
+        $stmt->bind_param('i', $_POST['item_id']);
+        $stmt->execute();
+        $stmt->close();
+        header('Location: ' . $_SERVER['REQUEST_URI']);
+        exit;
+    }
+
+    if (isset($_POST['action']) && $_POST['action'] === 'add') {
+        $title = trim($_POST['title'] ?? $_POST['item_name'] ?? '');
+        $platform = trim($_POST['platform'] ?? 'Desconhecido');
+        $stock = (int) ($_POST['stock'] ?? $_POST['quantity'] ?? 0);
+        $price = (float) ($_POST['price'] ?? 0);
+        $img = trim($_POST['image_url'] ?? '');
+
+        if ($title !== '') {
+            $stmt = $mysqli->prepare('INSERT INTO inventory (title, platform, stock, price, img) VALUES (?, ?, ?, ?, ?)');
+            $stmt->bind_param('ssids', $title, $platform, $stock, $price, $img);
+            $stmt->execute();
+            $stmt->close();
+            header('Location: ' . $_SERVER['REQUEST_URI']);
+            exit;
+        }
+    }
+}
+
+$result = $mysqli->query('SELECT * FROM inventory');
+$inventoryItems = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+?>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -27,23 +64,38 @@
             </label>
         </div>
 
+        <form action="" method="POST">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="platform" value="Desconhecido">
+            <input type="hidden" name="price" value="0.00">
+            <input type="hidden" name="image_url" value="">
+            <label>Nome do Item:</label>
+            <input type="text" name="item_name" required>
+            
+            <label>Quantidade:</label>
+            <input type="number" name="quantity" value="1" required>
+            
+            <button type="submit">Adicionar ao Inventário</button>
+        </form>
+
         <section id="add-item" class="add-item hidden">
             <h2>Novo jogo</h2>
-            <form id="add-form">
+            <form id="add-form" action="" method="POST">
+                <input type="hidden" name="action" value="add">
                 <label>Título
-                    <input type="text" id="title" required>
+                    <input type="text" id="title" name="title" required>
                 </label>
                 <label>Plataforma
-                    <input type="text" id="platform" required>
+                    <input type="text" id="platform" name="platform" required>
                 </label>
                 <label>Stock
-                    <input type="number" id="stock" min="0" required>
+                    <input type="number" id="stock" name="stock" min="0" required>
                 </label>
                 <label>Preço
-                    <input type="number" id="price" step="0.01" min="0" required>
+                    <input type="number" id="price" name="price" step="0.01" min="0" required>
                 </label>
                 <label>Imagem
-                    <input type="file" id="image" accept="image/*" required>
+                    <input type="text" id="image_url" name="image_url" placeholder="URL da imagem">
                 </label>
                 <button type="submit">Salvar</button>
             </form>
@@ -59,34 +111,38 @@
                         <th>Plataforma</th>
                         <th>Stock</th>
                         <th>Preço</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="inventory-body"></tbody>
+                <tbody id="inventory-body">
+                    <?php foreach ($inventoryItems as $item): ?>
+                        <tr>
+                            <td>
+                                <?php if (!empty($item['img'])): ?>
+                                    <img src="<?= htmlspecialchars($item['img']) ?>" alt="<?= htmlspecialchars($item['title'] ?? '') ?>" width="50">
+                                <?php endif; ?>
+                            </td>
+                            <td><?= htmlspecialchars($item['title'] ?? '') ?></td>
+                            <td><?= htmlspecialchars($item['platform'] ?? '') ?></td>
+                            <td><?= htmlspecialchars($item['stock'] ?? '') ?></td>
+                            <td><?= number_format((float)($item['price'] ?? 0), 2, ',', '.') ?>€</td>
+                            <td>
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="remove">
+                                    <input type="hidden" name="item_id" value="<?= htmlspecialchars($item['id'] ?? '') ?>">
+                                    <button type="submit">Remover</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
             </table>
         </section>
     </main>
 
-    <script src="database.js"></script>
     <script>
-        function renderInventory() {
-            const tbody = document.getElementById('inventory-body');
-            tbody.innerHTML = '';
-            database.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><img src="${item.img}" alt="${item.title}" width="50"></td>
-                    <td>${item.title}</td>
-                    <td>${item.platform}</td>
-                    <td>${item.stock}</td>
-                    <td>${item.price.toFixed(2)}€</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             const toggleAddCheckbox = document.getElementById('toggle-add');
-            const toggleRemoveCheckbox = document.getElementById('toggle-remove');
             const addSection = document.getElementById('add-item');
 
             toggleAddCheckbox.addEventListener('change', () => {
@@ -103,30 +159,6 @@
                 addSection.classList.remove('hidden');
                 addSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-
-            renderInventory();
-
-            document.getElementById('add-form').addEventListener('submit', event => {
-                event.preventDefault();
-
-                const imageFile = document.getElementById('image').files[0];
-                if (!imageFile) return;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    database.push({
-                        img: e.target.result,
-                        title: document.getElementById('title').value,
-                        platform: document.getElementById('platform').value,
-                        stock: Number(document.getElementById('stock').value),
-                        price: Number(document.getElementById('price').value)
-                    });
-                    saveDatabase();
-                    renderInventory();
-                    event.target.reset();
-                };
-                reader.readAsDataURL(imageFile);
-            });
         });
     </script>
 </body>
