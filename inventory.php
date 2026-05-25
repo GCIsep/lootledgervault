@@ -1,125 +1,192 @@
 <?php
-// Ativar erros e ligar à Base de Dados
+// Ativar erros para debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Liga à BD (garante que a pasta scripts e o ficheiro database.php existem)
+// Liga à Base de Dados
 require_once 'scripts/database.php';
+
+// Criar a tabela específica para o teu design
+$db->exec("CREATE TABLE IF NOT EXISTS games_inventory (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    platform TEXT,
+    stock INTEGER DEFAULT 0,
+    price REAL DEFAULT 0.0,
+    img TEXT
+)");
 
 // Processar formulários (Adicionar / Remover)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     
     // AÇÃO: ADICIONAR
     if ($_POST['action'] === 'add') {
-        $item_name = SQLite3::escapeString($_POST['item_name'] ?? '');
-        $quantity = (int)($_POST['quantity'] ?? 1);
+        $title = SQLite3::escapeString($_POST['title'] ?? '');
+        $platform = SQLite3::escapeString($_POST['platform'] ?? '');
+        $stock = (int)($_POST['stock'] ?? 0);
+        $price = (float)($_POST['price'] ?? 0.0);
+        
+        $imgPath = '';
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK && !empty($_FILES['image']['name'])) {
+            if (!is_dir('images')) mkdir('images', 0777, true);
+            $imgPath = 'images/' . basename($_FILES['image']['name']);
+            move_uploaded_file($_FILES['image']['tmp_name'], $imgPath);
+        }
 
-        if (!empty($item_name)) {
-            $db->exec("INSERT INTO inventory (item_name, quantity) VALUES ('$item_name', $quantity)");
+        if (!empty($title)) {
+            $db->exec("INSERT INTO games_inventory (title, platform, stock, price, img) 
+                       VALUES ('$title', '$platform', $stock, $price, '$imgPath')");
         }
     }
     
     // AÇÃO: REMOVER
-    if ($_POST['action'] === 'delete') {
+    if ($_POST['action'] === 'remove') {
         $item_id = (int)($_POST['item_id'] ?? 0);
         if ($item_id > 0) {
-            $db->exec("DELETE FROM inventory WHERE id = $item_id");
+            $db->exec("DELETE FROM games_inventory WHERE id = $item_id");
         }
     }
 
-    // Refresh automático da página para evitar submissões duplas
     header("Location: inventory.php");
     exit();
 }
 
-// Ir buscar todos os jogos à Base de Dados
-$result = $db->query("SELECT * FROM inventory");
+$result = $db->query("SELECT * FROM games_inventory");
 ?>
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LootLedgerVault - Inventário</title>
-    <link rel="stylesheet" href="styles/styles.css">
+    <title>Inventário - Loja de Jogos</title>
+    <link rel="stylesheet" href="styles/style.css">
     <style>
-        /* Pequenos ajustes caso o teu CSS não tenha estilos para tabelas */
-        .inventory-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .inventory-table th, .inventory-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        .inventory-table th { background-color: #f4f4f4; }
-        .btn-delete { background-color: #ff4d4d; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
-        .btn-delete:hover { background-color: #cc0000; }
+        /* Ajustes base para o formulário */
+        button { background-color: #ffaa00; color: #1a1a1a; font-weight: bold; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #e69900; }
+        input { padding: 5px; margin: 5px 0; border-radius: 3px; border: 1px solid #444; background: #333; color: white; }
+        
+        /* Placeholder para jogos sem capa */
+        .sem-capa { width: 60px; height: 80px; background-color: #333; border: 1px dashed #555; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #888; text-align: center; }
+        
+        /* =========================================
+           Lógica da Coluna Remover (Esconder/Mostrar)
+           ========================================= */
+        .col-remover { display: none !important; }
+        .modo-remover .col-remover { display: table-cell !important; }
+        @media screen and (max-width: 768px) {
+            .modo-remover .col-remover { display: block !important; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Inventário de Jogos</h1>
-        
-        <section class="add-item-section">
-            <h2>Adicionar Jogo</h2>
-            <form action="inventory.php" method="POST">
+    <header>
+        <h1>Gestão de Inventário</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="calendario.html">Calendário</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="controls-panel">
+            <label><input type="checkbox" id="toggle-add" /> Adicionar</label>
+            <label><input type="checkbox" id="toggle-remove" /> Remover</label>
+        </div>
+
+        <section id="add-item" class="add-item hidden">
+            <h2>Novo jogo</h2>
+            <form id="add-form" action="inventory.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="add">
                 
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label for="item_name">Nome do Jogo:</label><br>
-                    <input type="text" id="item_name" name="item_name" placeholder="Ex: The Witcher 3" required style="padding: 8px; width: 250px;">
-                </div>
+                <label>Título <input type="text" name="title" id="title" required></label>
+                <label>Plataforma <input type="text" name="platform" id="platform" required></label>
+                <label>Stock <input type="number" name="stock" id="stock" min="0" required></label>
+                <label>Preço <input type="number" name="price" id="price" step="0.01" min="0" required></label>
+                <label>Imagem (Opcional) <input type="file" name="image" id="image" accept="image/*"></label>
                 
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="quantity">Quantidade:</label><br>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" required style="padding: 8px; width: 100px;">
-                </div>
-                
-                <button type="submit" class="btn" style="padding: 10px 15px; cursor: pointer;">Adicionar ao Inventário</button>
+                <button type="submit">Salvar</button>
             </form>
         </section>
 
-        <hr style="margin: 30px 0;">
-
-        <section class="inventory-list-section">
-            <h2>Os Meus Jogos Guardados</h2>
-            <table class="inventory-table">
+        <section class="inventory-container">
+            <h2>Inventário Atual</h2>
+            <table id="tabela-jogos">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Quantidade</th>
-                        <th>Ações</th>
+                        <th>Capa</th>
+                        <th>Título</th>
+                        <th>Plataforma</th>
+                        <th>Stock</th>
+                        <th>Preço</th>
+                        <th class="col-remover">Ação</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="inventory-body">
                     <?php 
                     $temJogos = false;
-                    while ($row = $result->fetchArray(SQLITE3_ASSOC)): 
+                    while ($item = $result->fetchArray(SQLITE3_ASSOC)): 
                         $temJogos = true;
+                        $classeEsgotado = ($item['stock'] <= 0) ? 'item-esgotado' : '';
                     ?>
-                        <tr>
-                            <td><?php echo $row['id']; ?></td>
-                            <td><?php echo htmlspecialchars($row['item_name']); ?></td>
-                            <td><?php echo $row['quantity']; ?></td>
-                            <td>
-                                <form action="inventory.php" method="POST" style="margin: 0;">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="item_id" value="<?php echo $row['id']; ?>">
-                                    <button type="submit" class="btn-delete" onclick="return confirm('Tens a certeza que queres remover este jogo?');">Remover</button>
+                        <tr class="<?php echo $classeEsgotado; ?>">
+                            <td data-label="Capa">
+                                <?php if (!empty($item['img'])): ?>
+                                    <img src="<?php echo htmlspecialchars($item['img']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="capa-jogo">
+                                <?php else: ?>
+                                    <div class="sem-capa">Sem Capa</div>
+                                <?php endif; ?>
+                            </td>
+                            <td data-label="Título"><?php echo htmlspecialchars($item['title'] ?? ''); ?></td>
+                            <td data-label="Plataforma"><?php echo htmlspecialchars($item['platform'] ?? ''); ?></td>
+                            <td class="stock" data-label="Stock"><?php echo htmlspecialchars($item['stock'] ?? ''); ?></td>
+                            <td class="preco" data-label="Preço"><?php echo number_format((float)($item['price'] ?? 0), 2, '.', ''); ?></td>
+                            <td class="col-remover" data-label="Ação">
+                                <form method="POST" action="inventory.php" style="margin: 0;">
+                                    <input type="hidden" name="action" value="remove">
+                                    <input type="hidden" name="item_id" value="<?php echo htmlspecialchars($item['id'] ?? ''); ?>">
+                                    <button type="submit" onclick="return confirm('Apagar o jogo <?php echo addslashes(htmlspecialchars($item['title'])); ?>?');" style="background-color: #ff4d4d; color: white;">Apagar</button>
                                 </form>
                             </td>
                         </tr>
                     <?php endwhile; ?>
                     
                     <?php if (!$temJogos): ?>
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 20px; color: #666;">O teu inventário está vazio.</td>
-                        </tr>
+                        <tr><td colspan="6" style="text-align: center;">Nenhum jogo no inventário.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </section>
-        
-        <div style="margin-top: 30px;">
-            <a href="index.html" class="btn">Voltar ao Início</a>
-        </div>
-    </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lógica do botão Adicionar (Esconder/Mostrar Formulário)
+            const toggleAddCheckbox = document.getElementById('toggle-add');
+            const addSection = document.getElementById('add-item');
+
+            toggleAddCheckbox.addEventListener('change', () => {
+                if (toggleAddCheckbox.checked) {
+                    addSection.classList.remove('hidden');
+                    addSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    addSection.classList.add('hidden');
+                }
+            });
+
+            // Lógica do botão Remover (Esconder/Mostrar Coluna)
+            const toggleRemoveCheckbox = document.getElementById('toggle-remove');
+            const tabelaInventario = document.getElementById('tabela-jogos');
+
+            toggleRemoveCheckbox.addEventListener('change', () => {
+                if (toggleRemoveCheckbox.checked) {
+                    tabelaInventario.classList.add('modo-remover');
+                } else {
+                    tabelaInventario.classList.remove('modo-remover');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

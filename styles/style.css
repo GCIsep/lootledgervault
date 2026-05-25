@@ -206,4 +206,8 @@ td.preco::before {
     td.preco::before {
         content: attr(data-label) " - € ";
     }
+.col-remover { display: none !important; }
+.modo-remover .col-remover { display: table-cell !important; }
+@media screen and (max-width: 768px) {
+    .modo-remover .col-remover { display: block !important; }
 }
