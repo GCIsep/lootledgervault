@@ -1,4 +1,13 @@
 <?php
+// INICIAR A SESSÃO PARA SABER QUEM ESTÁ A ACEDER
+session_start();
+
+// VERIFICAÇÃO DE SEGURANÇA
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 // Ativar erros para debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -7,7 +16,7 @@ error_reporting(E_ALL);
 // Liga à Base de Dados
 require_once 'scripts/database.php';
 
-// Criar a tabela específica para o teu design
+// Criar a tabela específica
 $db->exec("CREATE TABLE IF NOT EXISTS games_inventory (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -17,10 +26,10 @@ $db->exec("CREATE TABLE IF NOT EXISTS games_inventory (
     img TEXT
 )");
 
-// Processar formulários (Adicionar / Remover)
+// Processar formulários (Adicionar / Remover / Atualizar Stock)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     
-    // AÇÃO: ADICIONAR
+    // AÇÃO: ADICIONAR JOGO NOVO
     if ($_POST['action'] === 'add') {
         $title = SQLite3::escapeString($_POST['title'] ?? '');
         $platform = SQLite3::escapeString($_POST['platform'] ?? '');
@@ -40,7 +49,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         }
     }
     
-    // AÇÃO: REMOVER
+    // AÇÃO: ATUALIZAR UNIDADES DE STOCK (+ ou -)
+    if ($_POST['action'] === 'update_stock') {
+        $item_id = (int)($_POST['item_id'] ?? 0);
+        $qty = (int)($_POST['qty'] ?? 0);
+        $operation = $_POST['operation'] ?? '';
+
+        if ($item_id > 0 && $qty > 0) {
+            // Vai buscar o stock atual do jogo
+            $current_stock = $db->querySingle("SELECT stock FROM games_inventory WHERE id = $item_id");
+            
+            if ($current_stock !== false) {
+                if ($operation === 'add') {
+                    $new_stock = $current_stock + $qty;
+                } elseif ($operation === 'sub') {
+                    // Garante que o stock não fica negativo (no mínimo 0)
+                    $new_stock = max(0, $current_stock - $qty);
+                } else {
+                    $new_stock = $current_stock;
+                }
+                
+                // Grava o novo stock na base de dados
+                $db->exec("UPDATE games_inventory SET stock = $new_stock WHERE id = $item_id");
+            }
+        }
+    }
+
+    // AÇÃO: REMOVER JOGO INTEIRO
     if ($_POST['action'] === 'remove') {
         $item_id = (int)($_POST['item_id'] ?? 0);
         if ($item_id > 0) {
@@ -63,36 +98,64 @@ $result = $db->query("SELECT * FROM games_inventory");
     <link rel="stylesheet" href="styles/style.css">
     <style>
         /* Ajustes base para o formulário */
-        button { background-color: #ffaa00; color: #1a1a1a; font-weight: bold; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; }
+        button { background-color: #ffaa00; color: #1a1a1a; font-weight: bold; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s;}
         button:hover { background-color: #e69900; }
         input { padding: 5px; margin: 5px 0; border-radius: 3px; border: 1px solid #444; background: #333; color: white; }
         
-        /* Placeholder para jogos sem capa */
         .sem-capa { width: 60px; height: 80px; background-color: #333; border: 1px dashed #555; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #888; text-align: center; }
         
         /* =========================================
-           Lógica da Coluna Remover (Esconder/Mostrar)
+           Lógica da Coluna de Ações (Esconder/Mostrar)
            ========================================= */
         .col-remover { display: none !important; }
         .modo-remover .col-remover { display: table-cell !important; }
         @media screen and (max-width: 768px) {
             .modo-remover .col-remover { display: block !important; }
         }
+
+        /* Botões de Gestão de Stock */
+        .acoes-container { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .qtd-input { width: 50px; text-align: center; padding: 6px; margin: 0; font-family: 'VT323', monospace; font-size: 1.1rem;}
+        .btn-add { background-color: #00cc66; color: white; padding: 6px 10px; font-size: 1.2rem; }
+        .btn-add:hover { background-color: #00994d; }
+        .btn-sub { background-color: #ffaa00; color: white; padding: 6px 10px; font-size: 1.2rem; }
+        .btn-sub:hover { background-color: #cc8800; }
+        .btn-del { background-color: #ff4d4d; color: white; padding: 6px 10px; font-size: 1.1rem; }
+        .btn-del:hover { background-color: #cc0000; }
     </style>
 </head>
 <body>
     <header>
         <h1>Gestão de Inventário</h1>
-        <nav>
+        <nav style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <a href="index.html">Início</a>
-            <a href="calendario.html">Calendário</a>
+            <a href="inventory.php">Inventário</a>
+            <a href="calendario.php">Calendário</a>
+            
+            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] > 0): ?>
+                <a href="admin.php">Admin</a>
+            <?php endif; ?>
+            
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
+                <span style="color: #ffaa00; font-family: 'VT323', monospace; font-size: 1.2rem;">
+                    👤 Bem-vindo, <strong style="color: #fff;"><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
+                    
+                    <?php if ($_SESSION['is_admin'] == 2): ?>
+                        <span style="color: #b300ff;" title="Super Admin">★</span>
+                    <?php elseif ($_SESSION['is_admin'] == 1): ?>
+                        <span style="color: #ff4d4d;" title="Admin">★</span>
+                    <?php endif; ?>
+                </span>
+                
+                <a href="logout.php" style="color: #ff4d4d; font-weight: bold; padding: 5px 10px; border: 1px solid #ff4d4d; border-radius: 4px; text-decoration: none;">Sair</a>
+            </div>
         </nav>
     </header>
 
     <main>
         <div class="controls-panel">
-            <label><input type="checkbox" id="toggle-add" /> Adicionar</label>
-            <label><input type="checkbox" id="toggle-remove" /> Remover</label>
+            <label><input type="checkbox" id="toggle-add" /> Adicionar Jogo</label>
+            <label><input type="checkbox" id="toggle-remove" /> Gerir Stock / Apagar</label>
         </div>
 
         <section id="add-item" class="add-item hidden">
@@ -120,7 +183,7 @@ $result = $db->query("SELECT * FROM games_inventory");
                         <th>Plataforma</th>
                         <th>Stock</th>
                         <th>Preço</th>
-                        <th class="col-remover">Ação</th>
+                        <th class="col-remover">Ações</th>
                     </tr>
                 </thead>
                 <tbody id="inventory-body">
@@ -141,13 +204,26 @@ $result = $db->query("SELECT * FROM games_inventory");
                             <td data-label="Título"><?php echo htmlspecialchars($item['title'] ?? ''); ?></td>
                             <td data-label="Plataforma"><?php echo htmlspecialchars($item['platform'] ?? ''); ?></td>
                             <td class="stock" data-label="Stock"><?php echo htmlspecialchars($item['stock'] ?? ''); ?></td>
-                            <td class="preco" data-label="Preço"><?php echo number_format((float)($item['price'] ?? 0), 2, '.', ''); ?></td>
-                            <td class="col-remover" data-label="Ação">
-                                <form method="POST" action="inventory.php" style="margin: 0;">
-                                    <input type="hidden" name="action" value="remove">
-                                    <input type="hidden" name="item_id" value="<?php echo htmlspecialchars($item['id'] ?? ''); ?>">
-                                    <button type="submit" onclick="return confirm('Apagar o jogo <?php echo addslashes(htmlspecialchars($item['title'])); ?>?');" style="background-color: #ff4d4d; color: white;">Apagar</button>
-                                </form>
+                            <td class="preco" data-label="Preço"><?php echo number_format((float)($item['price'] ?? 0), 2, '.', ''); ?>€</td>
+                            
+                            <td class="col-remover" data-label="Ações">
+                                <div class="acoes-container">
+                                    
+                                    <form method="POST" action="inventory.php" style="margin: 0; display: flex; gap: 4px; align-items: center;">
+                                        <input type="hidden" name="action" value="update_stock">
+                                        <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
+                                        <input type="number" name="qty" class="qtd-input" value="1" min="1" required title="Quantidade">
+                                        <button type="submit" name="operation" value="add" class="btn-add" title="Adicionar Unidades">+</button>
+                                        <button type="submit" name="operation" value="sub" class="btn-sub" title="Remover Unidades">-</button>
+                                    </form>
+
+                                    <form method="POST" action="inventory.php" style="margin: 0; margin-left: 10px;">
+                                        <input type="hidden" name="action" value="remove">
+                                        <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
+                                        <button type="submit" class="btn-del" onclick="return confirm('ATENÇÃO: Apagar o jogo <?php echo addslashes(htmlspecialchars($item['title'])); ?> da base de dados?');" title="Apagar Jogo">🗑️</button>
+                                    </form>
+
+                                </div>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -175,7 +251,7 @@ $result = $db->query("SELECT * FROM games_inventory");
                 }
             });
 
-            // Lógica do botão Remover (Esconder/Mostrar Coluna)
+            // Lógica do botão Gerir/Remover (Esconder/Mostrar Coluna)
             const toggleRemoveCheckbox = document.getElementById('toggle-remove');
             const tabelaInventario = document.getElementById('tabela-jogos');
 
