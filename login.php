@@ -4,8 +4,16 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// INICIAR SESSÃO - OBRIGATÓRIO PARA MANTER O LOGIN
+// INICIAR SESSÃO
 session_start();
+
+// ==========================================
+// ATALHO: SE JÁ ESTÁ LOGADO, SALTA O LOGIN
+// ==========================================
+if (isset($_SESSION['user_id'])) {
+    header("Location: inventory.php");
+    exit();
+}
 
 // Ligar à base de dados
 require_once 'scripts/database.php';
@@ -26,6 +34,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Verificar se encontrou e se a password está correta
         if ($result && $result['password'] === $password) {
+            
+            // 🛡️ A NOVA LINHA DE SEGURANÇA ENTRA AQUI 🛡️
+            session_regenerate_id(true);
+            
             // LOGIN COM SUCESSO!
             // 1. Guardar info na sessão
             $_SESSION['user_id'] = $result['id'];
@@ -58,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         :root {
             --arcane-gold: #F5D21D;
-            --error-red: #ff4d4d; /* Cor para as mensagens de erro */
+            --error-red: #ff4d4d;
         }
         
         body {
@@ -129,7 +141,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-family: 'VT323', monospace;
             font-size: 1.5rem;
             box-shadow: 0 0 15px rgba(245, 210, 29, 0.3);
-            /* Reset box-sizing para o input não sair da caixa */
             box-sizing: border-box;
         }
         
@@ -186,7 +197,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             opacity: 0.6;
         }
 
-        /* Classe para mensagens de erro */
         .error-msg {
             color: var(--error-red);
             font-size: 1.2rem;
@@ -236,7 +246,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="scanline"></div>
 
     <script>
-        // O CÓDIGO DA CHUVA MATRIX MANTÉM-SE IGUAL!
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
@@ -288,9 +297,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         resizeCanvas();
         initRain();
         animate();
-        
-        // Removemos o "Login fake (para teste)"
-        // Agora quem controla o login é o PHP lá em cima!
         
         console.log('%cLoot Ledger Vault – Login Terminal loaded', 'color:#F5D21D; font-family:monospace');
     </script>
