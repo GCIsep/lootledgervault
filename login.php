@@ -45,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['is_admin'] = $result['is_admin'];
             
             // 2. Atualizar o Último Acesso
+            date_default_timezone_set('Europe/Lisbon');
             $agora = date('Y-m-d H:i:s');
             $db->exec("UPDATE users SET ultimo_acesso = '$agora' WHERE id = " . $result['id']);
             

@@ -1,76 +1,113 @@
 <?php
-// tou cansada de editar esta merda, deixa-me em paz porra nixxie
+// INICIAR A SESSÃO PARA SABER QUEM ESTÁ A ACEDER (Igual ao inventory.php)
+session_start();
+
+// VERIFICAÇÃO DE SEGURANÇA
+if (!isset($_SESSION['user_id'])) {
+    // Se não usares login para o calendário, podes apagar ou comentar estas linhas
+    header("Location: login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendário - Loot Ledger Vault</title>
+    <title>Calendário - Gestão de Inventário</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        
-        :root { --arcane-gold: #F5D21D; }
-        
-        * { margin:0; padding:0; box-sizing:border-box; }
-        
+        /* =========================================
+           ESTILOS GERAIS (Baseados no teu CSS)
+           ========================================= */
         body {
-            background: #111;
-            color: var(--arcane-gold);
-            font-family: 'VT323', monospace;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0; 
+            line-height: 1.6;
         }
-        
-        .dashboard {
-            max-width: 1450px;
-            margin: 0 auto;
-            padding: 20px;
+
+        h1, h2, h3 {
+            color: #ffaa00;
         }
-        
+
+        /* =========================================
+           CABEÇALHO E NAVEGAÇÃO
+           ========================================= */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #1a1a1a;
-            padding: 18px 35px;
-            border-bottom: 5px solid var(--arcane-gold);
-            margin-bottom: 30px;
-            border-radius: 8px;
+            background-color: #0d0d0d;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #ffaa00;
         }
-        
-        .nav a {
-            color: var(--arcane-gold);
+
+        header nav {
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 15px; 
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        header nav a {
+            color: #ffffff;
             text-decoration: none;
-            margin: 0 22px;
-            font-size: 1.7rem;
+            margin: 0 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: color 0.3s;
         }
-        .nav a:hover, .nav a.active { color: #fff; text-shadow: 0 0 15px var(--arcane-gold); }
-        
+
+        header nav a:hover, header nav a.active {
+            color: #ffaa00;
+        }
+
+        /* =========================================
+           ESTRUTURA PRINCIPAL
+           ========================================= */
         .main-content {
             display: flex;
             gap: 30px;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex-wrap: wrap;
         }
-        
+
         /* Sidebar esquerda */
         .sidebar {
-            width: 390px;
-            background: rgba(20,20,20,0.97);
-            border: 4px solid var(--arcane-gold);
-            border-radius: 12px;
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            background-color: #262626;
+            border-radius: 8px;
             padding: 25px;
-            box-shadow: 0 0 50px var(--arcane-gold);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            height: fit-content;
         }
         
-        .section { margin-bottom: 40px; }
-        .section h3 { margin-bottom: 12px; font-size: 1.9rem; }
+        .section { margin-bottom: 30px; }
+        .section h3 { margin-bottom: 15px; font-size: 1.4rem; border-bottom: 1px solid #404040; padding-bottom: 5px; }
         
-        /* Calendário */
+        .sidebar-card {
+            background: #333333;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        /* =========================================
+           CALENDÁRIO
+           ========================================= */
         .calendar-container {
-            flex: 1;
-            background: rgba(20,20,20,0.97);
-            border: 5px solid var(--arcane-gold);
-            border-radius: 12px;
+            flex: 2;
+            min-width: 600px;
+            background-color: #262626;
+            border-radius: 8px;
             padding: 30px;
-            box-shadow: 0 0 60px rgba(245,210,29,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
         
         .calendar-header {
@@ -78,178 +115,233 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            font-size: 3rem;
+        }
+
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 2rem;
+            text-transform: uppercase;
         }
         
-        .nav-btn {
-            background: transparent;
-            border: 3px solid var(--arcane-gold);
-            color: var(--arcane-gold);
-            padding: 12px 40px;
-            font-size: 1.9rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
+        button {
+            background-color: #ffaa00; 
+            color: #1a1a1a; 
+            font-weight: bold; 
+            padding: 8px 16px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            transition: background 0.2s;
+            font-family: inherit;
         }
-        .nav-btn:hover { background: var(--arcane-gold); color: #000; }
+        
+        button:hover { background-color: #e69900; }
         
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            background: #111;
-            padding: 12px;
-            border-radius: 10px;
+            gap: 10px;
         }
         
         .day-header {
             text-align: center;
-            padding: 18px 10px;
-            background: linear-gradient(#2a2a2a, #1f1f1f);
-            font-size: 1.6rem;
-            border: 2px solid var(--arcane-gold);
-            border-radius: 6px;
-            text-shadow: 0 0 12px var(--arcane-gold);
-        }
-        
-        .day {
-            background: #1f1f1f;
-            min-height: 140px;
             padding: 12px;
-            border-radius: 8px;
-            border: 2px solid #333;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-        .day:hover { border-color: var(--arcane-gold); transform: translateY(-4px); }
-        .day.today { background: rgba(245,210,29,0.2); border-color: var(--arcane-gold); }
-        .day.other-month { opacity: 0.35; }
-        
-        .day-number { font-size: 2.1rem; margin-bottom: 10px; }
-        
-        .event {
-            font-size: 1.05rem;
-            padding: 4px 10px;
-            margin: 4px 0;
-            background: rgba(245,210,29,0.18);
-            border-left: 5px solid var(--arcane-gold);
+            background-color: #333333;
+            color: #ffaa00;
+            text-transform: uppercase;
+            font-weight: bold;
             border-radius: 4px;
         }
         
-        /* Modal */
+        .day {
+            background-color: #2e2e2e;
+            min-height: 120px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .day:hover { background-color: #3d3d3d; border-color: #ffaa00; }
+        .day.today { border: 2px solid #ffaa00; background-color: #332b1a; }
+        .day.other-month { opacity: 0.4; }
+        
+        .day-number { font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: #fff; }
+        
+        .event {
+            font-size: 0.85rem;
+            padding: 4px 8px;
+            margin: 4px 0;
+            background-color: #404040;
+            border-left: 3px solid #ffaa00;
+            border-radius: 3px;
+            color: #e0e0e0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* =========================================
+           MODAL
+           ========================================= */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.93);
+            background: rgba(0,0,0,0.8);
             z-index: 10000;
             align-items: center;
             justify-content: center;
         }
         
         .modal-content {
-            background: #1a1a1a;
-            border: 5px solid var(--arcane-gold);
-            border-radius: 12px;
-            padding: 40px;
+            background: #262626;
+            border-top: 4px solid #ffaa00;
+            border-radius: 8px;
+            padding: 30px;
             width: 90%;
-            max-width: 640px;
-            color: var(--arcane-gold);
-            box-shadow: 0 0 80px var(--arcane-gold);
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
+
+        .modal-content h2 { margin-top: 0; text-align: center; }
         
-        input, textarea, button {
-            font-family: 'VT323', monospace;
+        input, textarea {
             width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            background: #111;
-            border: 3px solid var(--arcane-gold);
-            color: var(--arcane-gold);
-            font-size: 1.5rem;
-            border-radius: 6px;
+            padding: 10px;
+            margin: 8px 0 15px 0;
+            background: #333;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+            font-family: inherit;
+            box-sizing: border-box;
         }
-        
-        button { cursor: pointer; }
-        button:hover { background: var(--arcane-gold); color: #000; }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #ffaa00;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-close {
+            background-color: #444;
+            color: #fff;
+        }
+        .btn-close:hover { background-color: #555; }
+        .btn-delete {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 4px 8px;
+            font-size: 0.85rem;
+            float: right;
+        }
+        .btn-delete:hover { background-color: #cc0000; }
+
+        @media screen and (max-width: 900px) {
+            .main-content { flex-direction: column; }
+            .sidebar { max-width: 100%; }
+            .calendar-container { min-width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <header>
-            <h1 style="color:#F5D21D;">Gestão de Inventário</h1>
-            <nav class="nav">
-                <a href="index.php">INÍCIO</a>
-                <a href="inventario.php">INVENTÁRIO</a>
-                <a href="calendario.php" class="active">CALENDÁRIO</a>
-                <a href="admin.php">ADMIN</a>
-            </nav>
-            <div>Bem-vindo, Ana</div>
-        </header>
+    <header>
+        <h1>Gestão de Inventário</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="inventory.php">Inventário</a>
+            <a href="calendario.php" class="active">Calendário</a>
+            
+            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] > 0): ?>
+                <a href="admin.php">Admin</a>
+            <?php endif; ?>
+            
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 15px; padding-right: 20px;">
+                <span style="color: #ffaa00; font-size: 1rem;">
+                    👤 Bem-vindo, <strong style="color: #fff;"><?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Utilizador'; ?></strong>
+                </span>
+                <?php if(isset($_SESSION['user_id'])): ?>
+                    <a href="logout.php" style="color: #ff4d4d; font-weight: bold; padding: 5px 10px; border: 1px solid #ff4d4d; border-radius: 4px; text-decoration: none; margin: 0;">Sair</a>
+                <?php endif; ?>
+            </div>
+        </nav>
+    </header>
 
-        <div class="main-content">
-            <!-- Sidebar esquerda -->
-            <div class="sidebar">
-                <div class="section">
-                    <h3 style="color:#ff4444;">⚠ Stock em Falta</h3>
-                    <p>Nenhum jogo esgotado.</p>
-                </div>
-                
-                <div class="section">
-                    <h3 style="color:#F5D21D;">📦 Stock em Excesso (&gt;50)</h3>
-                    <div style="background:#222; padding:18px; margin-bottom:15px; border-left:5px solid #F5D21D;">
-                        <strong>Elden Ring</strong><br>
-                        Quantidade atual: 60 unidades<br>
-                        Excesso detetado no sistema.
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h3 style="color:#00ff88;">✨ Últimos Jogos Adicionados</h3>
-                    <div style="background:#222; padding:18px; margin-bottom:15px; border-left:5px solid #00ff88;">
-                        Forza Horizon 6<br>
-                        Entrada inicial: 30 unidades<br>
-                        Plataforma: XBOX
-                    </div>
-                    <div style="background:#222; padding:18px; border-left:5px solid #00ff88;">
-                        Elden Ring<br>
-                        Entrada inicial: 60 unidades<br>
-                        Plataforma: XBOX
-                    </div>
+    <div class="main-content">
+        <div class="sidebar">
+            <div class="section">
+                <h3 style="color:#ff4d4d;">⚠ Stock em Falta</h3>
+                <div class="sidebar-card" style="border-left: 4px solid #ff4d4d;">
+                    <p style="margin:0;">Nenhum jogo esgotado.</p>
                 </div>
             </div>
-
-            <!-- Calendário Interativo -->
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <button class="nav-btn" onclick="prevMonth()">‹ Anterior</button>
-                    <div id="monthTitle"></div>
-                    <button class="nav-btn" onclick="nextMonth()">Próximo ›</button>
+            
+            <div class="section">
+                <h3>📦 Stock em Excesso (&gt;50)</h3>
+                <div class="sidebar-card" style="border-left: 4px solid #ffaa00;">
+                    <strong>Elden Ring</strong><br>
+                    <span style="font-size: 0.9em; color: #aaa;">Quantidade atual: 60 unidades<br>
+                    Excesso detetado no sistema.</span>
                 </div>
-                
-                <div class="calendar-grid" id="calendarGrid"></div>
             </div>
+            
+            <div class="section">
+                <h3 style="color:#00cc66;">✨ Últimos Adicionados</h3>
+                <div class="sidebar-card" style="border-left: 4px solid #00cc66;">
+                    <strong>Forza Horizon 6</strong><br>
+                    <span style="font-size: 0.9em; color: #aaa;">Entrada inicial: 30 un.<br>XBOX</span>
+                </div>
+                <div class="sidebar-card" style="border-left: 4px solid #00cc66;">
+                    <strong>Elden Ring</strong><br>
+                    <span style="font-size: 0.9em; color: #aaa;">Entrada inicial: 60 un.<br>XBOX</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button onclick="prevMonth()">‹ Anterior</button>
+                <h2 id="monthTitle"></h2>
+                <button onclick="nextMonth()">Próximo ›</button>
+            </div>
+            
+            <div class="calendar-grid" id="calendarGrid"></div>
         </div>
     </div>
 
-    <!-- Modal para editar eventos -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
-            <h2 id="modalDate" style="margin-bottom:25px; text-align:center;"></h2>
-            <div id="eventsList"></div>
+            <h2 id="modalDate"></h2>
             
-            <h3 style="margin:30px 0 15px;">Adicionar Evento</h3>
-            <input type="text" id="eventTitle" placeholder="Título do evento">
+            <div id="eventsList" style="margin-bottom: 20px; max-height: 200px; overflow-y: auto;"></div>
+            
+            <h3 style="font-size: 1.2rem; border-bottom: 1px solid #404040; padding-bottom: 5px;">Adicionar Evento</h3>
+            <label style="font-size: 0.9rem; font-weight: bold;">Título do evento</label>
+            <input type="text" id="eventTitle" placeholder="Ex: Reposição de Stock">
+            
+            <label style="font-size: 0.9rem; font-weight: bold;">Hora</label>
             <input type="time" id="eventTime">
-            <textarea id="eventDesc" rows="3" placeholder="Descrição (opcional)"></textarea>
             
-            <button onclick="addEventToDay()">Adicionar Evento</button>
-            <button onclick="closeModal()" style="background:#333; margin-left:15px;">Fechar</button>
+            <label style="font-size: 0.9rem; font-weight: bold;">Descrição (opcional)</label>
+            <textarea id="eventDesc" rows="3" placeholder="Detalhes do evento..."></textarea>
+            
+            <div class="modal-buttons">
+                <button style="flex: 1;" onclick="addEventToDay()">Salvar Evento</button>
+                <button style="flex: 1;" class="btn-close" onclick="closeModal()">Cancelar</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // LÓGICA DO CALENDÁRIO INTACTA
         let currentDate = new Date();
         let selectedDate = null;
         let events = JSON.parse(localStorage.getItem('vault_events')) || {};
@@ -264,7 +356,7 @@
             const month = currentDate.getMonth();
             
             document.getElementById('monthTitle').innerHTML = 
-                currentDate.toLocaleString('pt-PT', { month: 'long', year: 'numeric' }).toUpperCase();
+                currentDate.toLocaleString('pt-PT', { month: 'long', year: 'numeric' });
             
             const daysOfWeek = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
             daysOfWeek.forEach(d => {
@@ -278,19 +370,34 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
             
-            for (let i = firstDay - 1; i >= 0; i--) grid.appendChild(createDayElement(daysInPrevMonth - i, true));
-            for (let day = 1; day <= daysInMonth; day++) grid.appendChild(createDayElement(day, false));
+            const today = new Date();
+            
+            for (let i = firstDay - 1; i >= 0; i--) grid.appendChild(createDayElement(daysInPrevMonth - i, true, year, month - 1));
+            for (let day = 1; day <= daysInMonth; day++) grid.appendChild(createDayElement(day, false, year, month));
+            
             const remaining = 42 - grid.children.length;
-            for (let day = 1; day <= remaining; day++) grid.appendChild(createDayElement(day, true));
+            for (let day = 1; day <= remaining; day++) grid.appendChild(createDayElement(day, true, year, month + 1));
         }
 
-        function createDayElement(day, isOtherMonth) {
+        function createDayElement(day, isOtherMonth, currentYear, currentMonth) {
             const el = document.createElement('div');
-            el.className = `day ${isOtherMonth ? 'other-month' : ''}`;
             
-            const dateKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            // Ajuste para meses
+            let dYear = currentYear;
+            let dMonth = currentMonth;
+            if(dMonth < 0) { dMonth = 11; dYear--; }
+            if(dMonth > 11) { dMonth = 0; dYear++; }
+
+            const isToday = !isOtherMonth && 
+                            day === new Date().getDate() && 
+                            dMonth === new Date().getMonth() && 
+                            dYear === new Date().getFullYear();
+
+            el.className = `day ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`;
             
-            el.innerHTML = `<div class="day-number">${day}</div><div id="events-${dateKey}" style="font-size:0.95rem;"></div>`;
+            const dateKey = `${dYear}-${String(dMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            
+            el.innerHTML = `<div class="day-number">${day}</div><div id="events-${dateKey}"></div>`;
             
             if (events[dateKey]) {
                 const container = el.querySelector(`#events-${dateKey}`);
@@ -300,6 +407,14 @@
                     e.textContent = ev.time ? `${ev.time} ${ev.title}` : ev.title;
                     container.appendChild(e);
                 });
+                if(events[dateKey].length > 3) {
+                    const more = document.createElement('div');
+                    more.style.fontSize = "0.8rem";
+                    more.style.color = "#aaa";
+                    more.style.textAlign = "center";
+                    more.textContent = `+${events[dateKey].length - 3} eventos`;
+                    container.appendChild(more);
+                }
             }
             
             el.onclick = () => openDayModal(dateKey);
@@ -308,17 +423,20 @@
 
         function openDayModal(dateKey) {
             selectedDate = dateKey;
-            document.getElementById('modalDate').textContent = `Eventos - ${dateKey}`;
+            
+            const ptDateParts = dateKey.split('-');
+            const formattedDate = `${ptDateParts[2]}/${ptDateParts[1]}/${ptDateParts[0]}`;
+            document.getElementById('modalDate').textContent = `Eventos: ${formattedDate}`;
             
             const list = document.getElementById('eventsList');
             list.innerHTML = events[dateKey] && events[dateKey].length > 0 
                 ? events[dateKey].map((ev, i) => `
-                    <div style="margin-bottom:18px; padding:10px; background:#222; border-radius:6px;">
-                        <strong>${ev.time || ''} ${ev.title}</strong><br>
-                        ${ev.desc || ''}
-                        <button onclick="deleteEvent('${dateKey}', ${i});" style="float:right; padding:6px 14px; font-size:1rem;">Remover</button>
+                    <div style="margin-bottom:10px; padding:12px; background:#333; border-radius:4px; border-left: 3px solid #ffaa00;">
+                        <button class="btn-delete" onclick="deleteEvent('${dateKey}', ${i}); event.stopPropagation();">X</button>
+                        <strong style="color:#ffaa00;">${ev.time || ''} ${ev.title}</strong><br>
+                        <span style="font-size:0.9rem; color:#ccc;">${ev.desc || 'Sem descrição'}</span>
                     </div>`).join('')
-                : '<p style="opacity:0.6; text-align:center;">Nenhum evento neste dia.</p>';
+                : '<p style="color:#aaa; text-align:center; font-style:italic;">Nenhum evento agendado para este dia.</p>';
             
             document.getElementById('eventModal').style.display = 'flex';
         }
@@ -328,10 +446,13 @@
             const time = document.getElementById('eventTime').value;
             const desc = document.getElementById('eventDesc').value.trim();
             
-            if (!title) return alert("Escreve um título para o evento!");
+            if (!title) return alert("Por favor, escreve um título para o evento!");
             
             if (!events[selectedDate]) events[selectedDate] = [];
             events[selectedDate].push({ title, time, desc });
+            
+            // Ordenar por hora (se existir)
+            events[selectedDate].sort((a, b) => (a.time || "24:00").localeCompare(b.time || "24:00"));
             
             saveEvents();
             closeModal();
@@ -339,12 +460,12 @@
         }
 
         function deleteEvent(dateKey, index) {
-            if (confirm("Eliminar este evento?")) {
+            if (confirm("Tens a certeza que queres eliminar este evento?")) {
                 events[dateKey].splice(index, 1);
                 if (events[dateKey].length === 0) delete events[dateKey];
                 saveEvents();
-                openDayModal(dateKey);
-                renderCalendar();
+                openDayModal(dateKey); // Atualiza a modal
+                renderCalendar(); // Atualiza o calendário por trás
             }
         }
 
@@ -358,6 +479,7 @@
         function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
         function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
 
+        // Inicializar
         renderCalendar();
     </script>
 </body>

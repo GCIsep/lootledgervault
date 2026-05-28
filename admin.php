@@ -17,8 +17,10 @@ error_reporting(E_ALL);
 require_once 'scripts/database.php';
 
 // === REGISTAR ACESSO AO PAINEL DE ADMIN NA DB ===
+date_default_timezone_set('Europe/Lisbon');
 $user_id_log = (int)$_SESSION['user_id'];
 $data_acesso = date('Y-m-d H:i:s');
+//$data_acesso = gmdate('Y-m-d H:i:s');
 $descricao_acesso = "🛡️ Acedeu ao Painel de Administração";
 $db->exec("INSERT INTO events (user_id, event_date, description) VALUES ($user_id_log, '$data_acesso', '$descricao_acesso')");
 // ================================================
