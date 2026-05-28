@@ -16,6 +16,13 @@ error_reporting(E_ALL);
 // Liga à Base de Dados
 require_once 'scripts/database.php';
 
+// === REGISTAR ACESSO AO PAINEL DE ADMIN NA DB ===
+$user_id_log = (int)$_SESSION['user_id'];
+$data_acesso = date('Y-m-d H:i:s');
+$descricao_acesso = "🛡️ Acedeu ao Painel de Administração";
+$db->exec("INSERT INTO events (user_id, event_date, description) VALUES ($user_id_log, '$data_acesso', '$descricao_acesso')");
+// ================================================
+
 $mensagem = '';
 
 // Processar formulários (Adicionar / Remover Utilizadores)
@@ -58,12 +65,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
 // 1. Lista de utilizadores para a tabela de Gestão
 $result_users = $db->query("SELECT * FROM users ORDER BY id ASC");
 
-// 2. QUERY DO HISTÓRICO COMPLETO: Captura todos os logins (pesquisa pelo emoji da chave)
+// 2. QUERY DO HISTÓRICO COMPLETO: Captura logins (🔑) e acessos ao painel (🛡️)
 $result_logs = $db->query("
     SELECT e.event_date, e.description, u.username, u.is_admin 
     FROM events e 
     JOIN users u ON e.user_id = u.id 
-    WHERE e.description LIKE '🔑%' 
+    WHERE e.description LIKE '🔑%' OR e.description LIKE '🛡️%'
     ORDER BY e.id DESC
 ");
 ?>
@@ -116,7 +123,7 @@ $result_logs = $db->query("
 
         <section class="inventory-container admin-section" style="margin-top: 20px;">
             <h2>Criar Nova Conta</h2>
-            <form action="admin.php" method="POST">
+            <form action="admin.php" method="POST" id="formCriarConta">
                 <input type="hidden" name="action" value="add_user">
                 
                 <label for="username">Username:</label>
@@ -124,6 +131,8 @@ $result_logs = $db->query("
                 
                 <label for="password">Password:</label>
                 <input type="password" name="password" id="password" placeholder="Palavra-passe secreta" required>
+                
+                <div id="erroPassword" style="color: #ff4d4d; font-weight: bold; margin-bottom: 15px; display: none;"></div>
                 
                 <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; color: white;">
                     <input type="checkbox" name="is_admin" value="1" style="width: 18px; height: 18px; accent-color: #ffaa00;">
@@ -245,7 +254,8 @@ $result_logs = $db->query("
                 </tbody>
             </table>
         </section>
-
     </main>
+
+    <script src="scripts/admin_validation.js"></script>
 </body>
 </html>

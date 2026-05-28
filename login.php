@@ -48,6 +48,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $agora = date('Y-m-d H:i:s');
             $db->exec("UPDATE users SET ultimo_acesso = '$agora' WHERE id = " . $result['id']);
             
+            // ==========================================================
+            // 2.5 REGISTAR O LOGIN NO HISTÓRICO DA BASE DE DADOS (NOVO)
+            // ==========================================================
+            $user_id_log = (int)$result['id'];
+            $descricao_login = "🔑 Efetuou Login com Sucesso";
+            $db->exec("INSERT INTO events (user_id, event_date, description) VALUES ($user_id_log, '$agora', '$descricao_login')");
+            // ==========================================================
+            
             // 3. Redirecionar
             header("Location: inventory.php");
             exit();
