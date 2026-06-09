@@ -307,7 +307,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         initRain();
         animate();
         
-        console.log('%cLoot Ledger Vault – Login Terminal loaded', 'color:#F5D21D; font-family:monospace');
+    console.log('%cLoot Ledger Vault – Login Terminal loaded', 'color:#F5D21D; font-family:monospace');
     </script>
+    
+    <script src="scripts/login_validation.js"></script>
 </body>
 </html>
