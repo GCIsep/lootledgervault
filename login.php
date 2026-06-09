@@ -228,15 +228,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="error-msg"><?php echo htmlspecialchars($erro_login); ?></div>
         <?php endif; ?>
         
-        <form action="login.php" method="POST" id="loginForm">
+        <form action="login.php" method="POST" id="loginForm" novalidate>
             <div class="input-group">
                 <label>USERNAME</label>
-                <input type="text" name="username" id="username" placeholder="contractor_42" required>
+                <input type="text" name="username" id="username" placeholder="contractor_42">
             </div>
             
             <div class="input-group">
                 <label>PASSWORD</label>
-                <input type="password" name="password" id="password" placeholder="••••••••" required>
+                <input type="password" name="password" id="password" placeholder="••••••••">
             </div>
             
             <button type="submit" class="login-btn">ENTER THE VAULT</button>
