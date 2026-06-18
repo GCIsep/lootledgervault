@@ -1,0 +1,429 @@
+commit 2ef099eb23be09d8cd63c9870fc1394f6e859727
+Merge: 6d71271 a458c64
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu Jun 18 09:58:19 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit 6d71271c7c3d7ee2b862ecacb0b0a1fe4bd8accc
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu Jun 18 09:58:10 2026 +0100
+
+    compos o bug do calendario e adicionei a opção de alterar o preco para os admins
+
+commit a458c64bcb881406cca0bde80421047d75729d4b
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu Jun 18 09:56:02 2026 +0100
+
+    Guiao 3
+    
+    Tabela das User Stories
+
+commit 79811e6fbb7ee7caf576742eeb4f44038577d316
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Tue Jun 9 16:17:19 2026 +0100
+
+    Disable client-side validation on login form
+    
+    Add novalidate to the login form and remove HTML5 `required` attributes from the username and password inputs so submissions are not blocked by browser validation and server-side checks can handle validation. Also includes an updated binary scripts/lootledgervault.db file.
+
+commit 32d6cd8a08e6127bffbc0f96894611f97b9b726a
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Tue Jun 9 15:20:51 2026 +0100
+
+    Add client-side login validation
+    
+    Add scripts/login_validation.js to validate username and password on submit, provide inline error styling, focus handling, and clear error state on input. Include the new script in login.php and adjust a console.log indentation. Also update file modes for the uploaded .xlsx and update the binary DB file (scripts/lootledgervault.db). This improves UX by preventing empty login submissions before reaching the server.
+
+commit da0b24bdb240f92569652f386ab701613308d37b
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 28 10:26:55 2026 +0100
+
+    Update https___github.com_GCIsep_lootledgervault_Tente n....xlsx
+
+commit d62c7258bb72948c999ea6fdce016eeb19659a61
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 28 10:26:29 2026 +0100
+
+    Create https___github.com_GCIsep_lootledgervault_Tente n....xlsx
+
+commit 98d55f64406c266f93b7663aea6cb74a82499677
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 28 10:22:32 2026 +0100
+
+    adicionei a conta do andré pq ele ainda n tinha conta admin
+
+commit e6401dd4eca67a3cc0d5a18bf3e97d91bacf862f
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 28 09:55:34 2026 +0100
+
+    Improve calendar UI, session checks and timezone logging
+    
+    Add session handling and auth redirect to calendario.php; fully refactor calendar layout and styles, update header/nav to show username/logout and conditional admin link, improve sidebar cards, modal form (add time field, better buttons) and responsive behavior. Enhance calendar JS: correct day/month handling, mark today, show "+N eventos" overflow, sort events by time, and refine modal/event UX. Set timezone (Europe/Lisbon) before logging accesses in admin.php and before updating last access in login.php. Also update file modes for grimorio.html, images/Vid_1.mp4 and the bundled SQLite DB file (scripts/lootledgervault.db) — DB binary changed.
+
+commit cb78ee093a01efc338a671df720e6703e0979e69
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 28 09:37:23 2026 +0100
+
+    tou cansada de editar o calendario
+
+commit 4903c498fa5be2c3498195e61e0ee0bf461829e6
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 28 09:17:32 2026 +0100
+
+    voltei a mudar o calendario nixxie:3
+
+commit 9101e897495451e8365bdbbc67671899399a2638
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 28 08:57:26 2026 +0100
+
+    mudei o calendario para podermos editar e mexer nele quando logados :nixxie3
+
+commit 40dc8c5b60ce05252ff14720616b1806483d1593
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 28 08:44:53 2026 +0100
+
+    Log admin/login events; add password validation
+    
+    Record admin panel access and successful logins in the events table, and add client-side password validation for account creation.
+    
+    Details:
+    - admin.php: insert an "🛡️ Acedeu ao Painel de Administração" event on page load, include 🛡️ entries in the events query, add form id and an error message container, and include the new validation script.
+    - login.php: insert a "🔑 Efetuou Login com Sucesso" event on successful authentication and update last access timestamp.
+    - scripts/admin_validation.js: new client-side validation to require passwords be at least 8 characters and show a visible error state.
+    - scripts/lootledgervault.db: database file updated (events table/data updated to reflect new logging).
+    
+    Purpose: provide an audit trail for logins and admin panel access and improve UX/security by preventing weak passwords at account creation.
+
+commit 3cef09b524943b1cecd9ad9945d7873fe3730a3a
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Tue May 26 10:28:36 2026 +0100
+
+    melhorei o vid pq eu achei q tava ruim
+
+commit a5da917d11a26ad80cccbf870fb85df7d4492a47
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Tue May 26 10:22:26 2026 +0100
+
+    melhorei umas paradas ai
+
+commit 452580114f6f2895d53d5c4e063b0759f674b2f3
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Tue May 26 10:20:32 2026 +0100
+
+    mudei umas paradas aq
+
+commit 2f550bdd983aec9c72318c432dbb17d1718cdc96
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Tue May 26 10:20:16 2026 +0100
+
+    mudei umas paradas aq
+
+commit 50c0b63d75dc9494fbe42de50ba7bdbad30e2193
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Tue May 26 10:16:18 2026 +0100
+
+    Add access logs to admin panel
+    
+    Introduce a new access-log view and improve the admin UI: add a query to fetch login events (WHERE description LIKE '🔑%') and render a new "Registo de Acessos" section showing user, role, date and terminal record. Rework users query (ORDER BY id), rename variables, remove the inline "Último Acesso" column from the users table (access info is now in logs), and apply styling/layout tweaks (titles, button transition, admin-section blocks). Minor cleanup of comments and session-area formatting. Also includes an updated binary DB file under scripts/lootledgervault.db.
+
+commit fefd14bcc02c06d5cd45ff0e599ee49112a2959f
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Tue May 26 10:15:21 2026 +0100
+
+    mudei umas cenas pra termos um video de entrada
+
+commit c680ef7e3f00a3407bc89ec727ae9dcffea3c221
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Tue May 26 10:14:50 2026 +0100
+
+    criei e adicionei um video nas imagens
+
+commit a379b84f3ea7ffe3818b85600c65d64a2ae0bb2e
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 20:49:22 2026 +0100
+
+    Improve login session handling; rename index.html
+    
+    Add session regeneration on successful login to mitigate session fixation and add an early redirect that sends already-logged-in users to inventory.php. Start the session and perform a session_id regeneration after password validation. Minor cleanup: remove leftover test comments/unused notes in login.php and tidy CSS/JS comments. Also rename htmls/index.html to index.html and include an updated binary database file (scripts/lootledgervault.db).
+
+commit b5d885fbefba7d20a8ac913c11820faa206ce4cb
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 20:39:31 2026 +0100
+
+    Log inventory actions and show calendar events
+    
+    Read events from the DB and render them in the calendar with styled event badges (calendario.php). Exported events as JSON for client-side rendering and adjusted calendar cell layout/styles. Record inventory operations in events (inventory.php): new game added, stock increases/decreases, and removals now insert event rows with date and user_id. Also adds a new image asset (images/Forza.png) and updates the SQLite DB file.
+
+commit 90e646658f3513efbcfd64be7a5a20284f88166c
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 20:31:01 2026 +0100
+
+    Add admin & calendar pages and secure inventory
+    
+    Introduce server-side account and calendar management and tighten inventory access. Added admin.php (user creation/removal UI with admin level checks and protections for super-admins), calendario.php (dynamic calendar + stock summaries from games_inventory), login.php and logout.php. Updated inventory.php to require sessions, create games_inventory table, and add stock update actions (add/subtract) and UI improvements. Moved several static HTML files into htmls/, replaced client-side login link to login.php, removed legacy calendario.html and database.js, and cleaned up unused files. These changes shift functionality to server-side for authentication, user management and inventory control.
+
+commit d4f29919dfb0a7e130858e38e8dd1364a132b241
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 18:25:26 2026 +0100
+
+    Inventory: add game schema, image upload & UI
+    
+    Create a new games_inventory table and migrate inventory handling to support title, platform, stock, price and image path. Add image upload handling (saves to images/), create images dir if missing, and change delete action name to 'remove'. Revamp inventory.php UI: new form fields, improved table layout with cover thumbnails/placeholder, header/nav, JS toggles for show/hide add and remove controls, and confirmation on removal. Update stylesheet link and add CSS rules for the removable column (also mirrored in styles/style.css). Added a new image asset and updated filesystem modes for some image files and a test file; the SQLite DB file was also changed.
+
+commit f28228a1ca1fa243b13792cba4b4e312c001585a
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 17:54:46 2026 +0100
+
+    parte do guiao
+
+commit 3b30d6752b73cbdbde45a265a94293ae72c2e57c
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 15:46:33 2026 +0100
+
+    teste
+
+commit fb40b70180e953619c888ed05514ad6362f90c3b
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 15:21:12 2026 +0100
+
+    testei o php
+
+commit f21e0608c5c22790a9c3c2bc839e14a1aef45195
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 15:14:38 2026 +0100
+
+    Create test.php
+
+commit 144ea31fe37f4d61fefbe11dfbce7b5baeb7f277
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 25 14:38:49 2026 +0100
+
+    Update .gitignore
+
+commit f3e61b20e0009ac4a74c3157feef0bb145f1e931
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 10:33:33 2026 +0100
+
+    Pus um log por causa do guiao
+
+commit 54d70694a3bb1a40d5c7324751eab1c5a6f9b274
+Merge: b48863e 5e31e6d
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 10:28:27 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit b48863e658b895f0a27e547e6aa234e25f56c66b
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 10:27:58 2026 +0100
+
+    Update inventory.html
+
+commit 5e31e6df41d21aa2f62bc5811b64f128e3dc1b7a
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 21 10:27:58 2026 +0100
+
+    voltei a melhorar um pouco a database
+
+commit 2a6e07960a02c3ff555530e4f75d940487f998ab
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 10:25:16 2026 +0100
+
+    Update calendario.html
+
+commit 33563c0b83c60f7a441d5175008052824986148c
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 10:23:28 2026 +0100
+
+    Update calendario.html
+
+commit bb8125ad23fb6cdc9448a9e7dfbd0db87be74bcd
+Merge: 92988f9 471561d
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 10:23:01 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit 92988f996b720fddc331a32a066ec9f72313f402
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 10:20:18 2026 +0100
+
+    Update calendario.html
+
+commit 471561d4e6044509cb570e4ca1e7a2a0057b0691
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 10:18:25 2026 +0100
+
+    adicionei o botao remover
+
+commit 805794f72be9e9b6f90716c129fc0acbae094618
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 21 10:15:00 2026 +0100
+
+    added a database base
+
+commit 8288d6fae3151a2850152ae8b129d43a00cdf2dd
+Author: Ana Luisa <ana.email@dominio.com>
+Date:   Thu May 21 10:06:15 2026 +0100
+
+    changed the output to go to the login page instead of the inventory.
+
+commit d6f971b17d46255f5e9061b08c340999a685921e
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 21 09:53:38 2026 +0100
+
+    Add initial login page with styling and functionality
+
+commit d2e7bf79fcf0277ee76cf8e6e25803db691e46cf
+Merge: 13d3c55 eefa459
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 09:48:10 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit 13d3c55170df640ba2a15043d0609744d026bf5c
+Author: andreassuncao07 <1251746@isep.ipp.pt>
+Date:   Thu May 21 09:48:06 2026 +0100
+
+    Create calendario.html
+
+commit eefa45916191b07b63e740253f6d345a2719a622
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 09:47:09 2026 +0100
+
+    parte do guiao
+
+commit a418bf1b85cae716c1d4b2c5361267361124611f
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 21 08:49:43 2026 +0100
+
+    Update adicionar.html
+
+commit 7c078202c175c0da5c7932c209834d8ac909dc9c
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 18 14:55:14 2026 +0100
+
+    adicionei a abilidade de adicionar jogos ao stock, uma database e leitura da database
+
+commit c5da07b13d1eb069330903d753a354b18624bedf
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Mon May 18 14:19:44 2026 +0100
+
+    hg
+
+commit 03668b5a25f13f7013395c87776665e93be05b97
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:34:15 2026 +0100
+
+    Update index.html
+
+commit 4c5978e031ce4516411a9b37259654bd291c6a66
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:31:59 2026 +0100
+
+    Create fundo_do_Index_estrelas.png
+
+commit 6b1c27f2745a9c31bb9c52919f53e23fc175cf21
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:27:11 2026 +0100
+
+    Create omeutrabalho.log
+
+commit 0c57eff79576a644160ff8b7cc2c7bfd3fd19cf0
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:23:48 2026 +0100
+
+    Create .gitignore
+
+commit a2030f40d6be55b81b9b45d7d6f26b2768f19417
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:21:08 2026 +0100
+
+    Create adicionar.html
+
+commit 9626953c3e8b549cbac8aeb32acd92d830423a4a
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:17:47 2026 +0100
+
+    parte do guiao 2
+
+commit f3960c4f388ec8ff3579c2d3f1c474e9d3f0e63b
+Merge: 9cb4f43 1aedffd
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:12:37 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit 9cb4f43ca1faee15f4bc04cbc710f53fb8bdcdb7
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:12:33 2026 +0100
+
+    Create inventario.html
+
+commit 1aedffde9ca766b684e9d2591cdc5170f99f6bee
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:12:09 2026 +0100
+
+    Update index.html
+
+commit d67760a56443df718bc27e3531d2485c74fc90b3
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:11:30 2026 +0100
+
+    parte do guiao
+
+commit ef71dcda4e72c87e72edca4f1cbc586c4e335c57
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:08:11 2026 +0100
+
+    teste do vscode
+
+commit a9676930b22da9f1063d20c4037ab7ff48200c80
+Merge: b26aa16 0c53bc9
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:03:41 2026 +0100
+
+    Merge branch 'main' of https://github.com/GCIsep/lootledgervault
+
+commit b26aa16e78911d8e8656a891761e4345c492c52a
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 10:03:17 2026 +0100
+
+    t
+
+commit 0c53bc98fffb3e116e4434dc430f6e759097b5f7
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:03:13 2026 +0100
+
+    Update comments for clarity in index.html
+
+commit 40003ad6023500c0410a5fd34d3bdaa3cf147fcf
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 10:00:31 2026 +0100
+
+    Rename O_Menu_Antes_do_inicial to index.html
+
+commit b4db0d1934c205ff59aa1003456df334c64fa9b1
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 09:59:29 2026 +0100
+
+    Add initial menu HTML for Loot Ledger Vault
+
+commit 65233c7c1cb89e8bddde140fa20b2fbfee0ef4f6
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 09:57:42 2026 +0100
+
+    Adicionei um ficheiro test.css
+
+commit e40f813f3837f6ea7c1577a59f07d913bbef7e05
+Author: nixxie3 <1251891@isep.ipp.pt>
+Date:   Thu May 14 09:51:16 2026 +0100
+
+    Update README.md
+
+commit c13a46dd151b8498463f9e94493bdfb5321a9e44
+Author: GCIsep <1251895@isep.ipp.pt>
+Date:   Thu May 14 09:35:07 2026 +0100
+
+    Initial commit
