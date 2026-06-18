@@ -16,7 +16,7 @@ error_reporting(E_ALL);
 // Liga à Base de Dados
 require_once 'scripts/database.php';
 
-// Criar a tabela específica
+// Criar a tabela específica (caso não exista)
 $db->exec("CREATE TABLE IF NOT EXISTS games_inventory (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -26,7 +26,7 @@ $db->exec("CREATE TABLE IF NOT EXISTS games_inventory (
     img TEXT
 )");
 
-// Processar formulários (Adicionar / Remover / Atualizar Stock)
+// Processar formulários (Adicionar / Remover / Atualizar Stock / Atualizar Preço)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     
     $hoje = date('Y-m-d'); // Guarda a data de hoje
@@ -90,6 +90,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         }
     }
 
+    // AÇÃO: ATUALIZAR PREÇO (EXCLUSIVO PARA ADMINS)
+    if ($_POST['action'] === 'update_price') {
+        // Bloqueio de segurança: Se não for admin, ignora a ação
+        if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] > 0) {
+            $item_id = (int)($_POST['item_id'] ?? 0);
+            $new_price = (float)($_POST['price'] ?? 0.0);
+
+            if ($item_id > 0 && $new_price >= 0) {
+                $jogo_title = $db->querySingle("SELECT title FROM games_inventory WHERE id = $item_id");
+                
+                if ($jogo_title) {
+                    $db->exec("UPDATE games_inventory SET price = $new_price WHERE id = $item_id");
+                    
+                    // Registar no calendário
+                    $nome_jogo = SQLite3::escapeString($jogo_title);
+                    $desc = SQLite3::escapeString("💰 Preço alterado: $nome_jogo para " . number_format($new_price, 2) . "€");
+                    $db->exec("INSERT INTO events (event_date, description, user_id) VALUES ('$hoje', '$desc', $user_id)");
+                }
+            }
+        }
+    }
+
     // AÇÃO: REMOVER JOGO INTEIRO
     if ($_POST['action'] === 'remove') {
         $item_id = (int)($_POST['item_id'] ?? 0);
@@ -133,12 +155,23 @@ $result = $db->query("SELECT * FROM games_inventory");
 
         .acoes-container { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .qtd-input { width: 50px; text-align: center; padding: 6px; margin: 0; font-family: 'VT323', monospace; font-size: 1.1rem;}
+        
+        /* ESTILOS DE PREÇO (VISÍVEL VS MODO EDIÇÃO) */
+        .price-input { width: 70px; text-align: center; padding: 4px; font-size: 1rem; color: #00cc66; font-weight: bold; border: 1px solid #00cc66; background: #262626;}
+        .price-form { display: none !important; }
+        .price-static { display: inline !important; }
+        
+        .modo-remover .price-form { display: flex !important; margin: 0; gap: 5px; align-items: center; justify-content: flex-start; }
+        .modo-remover .price-static { display: none !important; }
+
         .btn-add { background-color: #00cc66; color: white; padding: 6px 10px; font-size: 1.2rem; }
         .btn-add:hover { background-color: #00994d; }
         .btn-sub { background-color: #ffaa00; color: white; padding: 6px 10px; font-size: 1.2rem; }
         .btn-sub:hover { background-color: #cc8800; }
         .btn-del { background-color: #ff4d4d; color: white; padding: 6px 10px; font-size: 1.1rem; }
         .btn-del:hover { background-color: #cc0000; }
+        .btn-save-price { background-color: #00cc66; color: white; padding: 5px 8px; font-size: 0.9rem; }
+        .btn-save-price:hover { background-color: #00994d; }
     </style>
 </head>
 <body>
@@ -146,7 +179,7 @@ $result = $db->query("SELECT * FROM games_inventory");
         <h1>Gestão de Inventário</h1>
         <nav style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <a href="index.html">Início</a>
-            <a href="inventory.php">Inventário</a>
+            <a href="inventory.php" style="color: #ffaa00;">Inventário</a>
             <a href="calendario.php">Calendário</a>
             
             <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] > 0): ?>
@@ -218,10 +251,27 @@ $result = $db->query("SELECT * FROM games_inventory");
                                     <div class="sem-capa">Sem Capa</div>
                                 <?php endif; ?>
                             </td>
-                            <td data-label="Título"><?php echo htmlspecialchars($item['title'] ?? ''); ?></td>
+                            <td data-label="Título" style="font-weight: bold;"><?php echo htmlspecialchars($item['title'] ?? ''); ?></td>
                             <td data-label="Plataforma"><?php echo htmlspecialchars($item['platform'] ?? ''); ?></td>
-                            <td class="stock" data-label="Stock"><?php echo htmlspecialchars($item['stock'] ?? ''); ?></td>
-                            <td class="preco" data-label="Preço"><?php echo number_format((float)($item['price'] ?? 0), 2, '.', ''); ?>€</td>
+                            <td class="stock" data-label="Stock" style="font-family: 'VT323', monospace; font-size: 1.2rem;"><?php echo htmlspecialchars($item['stock'] ?? ''); ?></td>
+                            
+                            <td class="preco" data-label="Preço">
+                                <?php if ($_SESSION['is_admin'] > 0): ?>
+                                    <span class="price-static" style="font-size: 1.1rem; color: #00cc66; font-weight: bold;">
+                                        <?php echo number_format((float)($item['price'] ?? 0), 2, '.', ''); ?>€
+                                    </span>
+                                    <form method="POST" action="inventory.php" class="price-form">
+                                        <input type="hidden" name="action" value="update_price">
+                                        <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
+                                        <input type="number" name="price" value="<?php echo number_format((float)($item['price'] ?? 0), 2, '.', ''); ?>" step="0.01" min="0" class="price-input" title="Editar Preço">
+                                        <button type="submit" class="btn-save-price" title="Guardar Novo Preço">💾</button>
+                                    </form>
+                                <?php else: ?>
+                                    <span style="font-size: 1.1rem; color: #00cc66; font-weight: bold;">
+                                        <?php echo number_format((float)($item['price'] ?? 0), 2, '.', ''); ?>€
+                                    </span>
+                                <?php endif; ?>
+                            </td>
                             
                             <td class="col-remover" data-label="Ações">
                                 <div class="acoes-container">

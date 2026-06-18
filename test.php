@@ -1,42 +1,19 @@
 <?php
-// Simple PHP test page
+$dir = './'; // Substitua pelo caminho da sua diretoria
 
-function add($a, $b) {
-	return $a + $b;
-}
-
-$tests = [];
-
-$tests[] = [
-	'name' => 'Addition of positives',
-	'expected' => 5,
-	'actual' => add(2,3)
-];
-
-$tests[] = [
-	'name' => 'Addition with zero',
-	'expected' => 7,
-	'actual' => add(7,0)
-];
-
-$passed = 0;
-foreach ($tests as $t) {
-	if ($t['expected'] === $t['actual']) {
-		$status = 'PASS';
-		$passed++;
-	} else {
-		$status = 'FAIL';
-	}
-	echo sprintf("%s: %s (expected=%s, actual=%s)\n", $status, $t['name'], var_export($t['expected'], true), var_export($t['actual'], true));
-}
-
-echo "\nSummary: {$passed}/" . count($tests) . " tests passed.\n";
-
-// Return HTTP 200 on success, 500 if any test failed
-if ($passed === count($tests)) {
-	http_response_code(200);
+// Verifica se o diretório existe
+if (is_dir($dir)) {
+    // Lê o conteúdo removendo o '.' e o '..'
+	$conteudo = array_diff(scandir($dir), ['.', '..']);
+    
+    foreach ($conteudo as $item) {
+		if (str_starts_with($item, 'tester')) {
+        continue;
+    }
+        // Exibe o nome do ficheiro ou pasta
+        echo $item . "<br>";
+    }
 } else {
-	http_response_code(500);
+    echo "Diretório não encontrado.";
 }
-
 ?>
